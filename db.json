@@ -1,0 +1,443 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "admin",
+      "password": "admin123",
+      "email": "admin@bibliotech.com",
+      "role": "admin",
+      "fullName": "Administrador BiblioTech",
+      "active": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "username": "librarian",
+      "password": "lib123",
+      "email": "librarian@bibliotech.com",
+      "role": "librarian",
+      "fullName": "Bibliotecario Principal",
+      "active": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "username": "member",
+      "password": "mem123",
+      "email": "member@bibliotech.com",
+      "role": "member",
+      "fullName": "Usuario Miembro",
+      "active": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "1",
+      "name": "Ficción",
+      "description": "Obras literarias de ficción"
+    },
+    {
+      "id": "2",
+      "name": "No Ficción",
+      "description": "Obras de no ficción"
+    },
+    {
+      "id": "3",
+      "name": "Ciencia",
+      "description": "Libros científicos y técnicos"
+    },
+    {
+      "id": "4",
+      "name": "Historia",
+      "description": "Libros históricos"
+    },
+    {
+      "id": "5",
+      "name": "Tecnología",
+      "description": "Libros sobre tecnología y programación"
+    }
+  ],
+  "authors": [
+    {
+      "id": "1",
+      "firstName": "Gabriel",
+      "lastName": "García Márquez",
+      "birthDate": "1927-03-06T00:00:00.000Z",
+      "nationality": "Colombiano",
+      "biography": "Escritor y periodista colombiano, ganador del Premio Nobel de Literatura"
+    },
+    {
+      "id": "2",
+      "firstName": "Isabel",
+      "lastName": "Allende",
+      "birthDate": "1942-08-02T00:00:00.000Z",
+      "nationality": "Chilena",
+      "biography": "Escritora chilena de narrativa y novela"
+    },
+    {
+      "id": "3",
+      "firstName": "Jorge Luis",
+      "lastName": "Borges",
+      "birthDate": "1899-08-24T00:00:00.000Z",
+      "nationality": "Argentino",
+      "biography": "Escritor argentino de cuentos, poesía y ensayos"
+    },
+    {
+      "id": "4",
+      "firstName": "Mario",
+      "lastName": "Vargas Llosa",
+      "birthDate": "1936-03-28T00:00:00.000Z",
+      "nationality": "Peruano",
+      "biography": "Escritor peruano, premio Nobel de Literatura"
+    }
+  ],
+  "publishers": [
+    {
+      "id": "1",
+      "name": "Editorial Planeta",
+      "country": "España",
+      "website": "www.planeta.es",
+      "email": "info@planeta.es",
+      "phone": "+34900123456",
+      "address": "Barcelona, España",
+      "foundedYear": 1949
+    },
+    {
+      "id": "2",
+      "name": "Penguin Random House",
+      "country": "USA",
+      "website": "www.penguinrandomhouse.com",
+      "email": "info@prh.com",
+      "phone": "+1234567890",
+      "address": "New York, USA",
+      "foundedYear": 1927
+    },
+    {
+      "id": "3",
+      "name": "Alfaguara",
+      "country": "España",
+      "website": "www.alfaguara.com",
+      "email": "info@alfaguara.com",
+      "phone": "+34900654321",
+      "address": "Madrid, España",
+      "foundedYear": 1964
+    }
+  ],
+  "books": [
+    {
+      "id": "1",
+      "title": "Cien años de soledad",
+      "isbn": "978-0-307-47472-3",
+      "authorId": "1",
+      "publisherId": "1",
+      "categoryId": "1",
+      "publicationYear": 1967,
+      "totalCopies": 10,
+      "availableCopies": 7,
+      "description": "Novela del escritor colombiano Gabriel García Márquez",
+      "language": "Español",
+      "pages": 432
+    },
+    {
+      "id": "2",
+      "title": "La casa de los espíritus",
+      "isbn": "978-1-501-11707-8",
+      "authorId": "2",
+      "publisherId": "2",
+      "categoryId": "1",
+      "publicationYear": 1982,
+      "totalCopies": 8,
+      "availableCopies": 5,
+      "description": "Primera novela de Isabel Allende",
+      "language": "Español",
+      "pages": 448
+    },
+    {
+      "id": "3",
+      "title": "Ficciones",
+      "isbn": "978-0-8021-5050-0",
+      "authorId": "3",
+      "publisherId": "3",
+      "categoryId": "1",
+      "publicationYear": 1944,
+      "totalCopies": 6,
+      "availableCopies": 4,
+      "description": "Colección de cuentos de Jorge Luis Borges",
+      "language": "Español",
+      "pages": 174
+    },
+    {
+      "id": "4",
+      "title": "La ciudad y los perros",
+      "isbn": "978-8-420-42156-7",
+      "authorId": "4",
+      "publisherId": "1",
+      "categoryId": "1",
+      "publicationYear": 1963,
+      "totalCopies": 5,
+      "availableCopies": 1,
+      "description": "Primera novela de Mario Vargas Llosa",
+      "language": "Español",
+      "pages": 408
+    },
+    {
+      "id": "1765173460907",
+      "title": "Cien Pies",
+      "isbn": "123185646-1",
+      "authorId": "2",
+      "publisherId": "1",
+      "categoryId": "2",
+      "publicationYear": 2025,
+      "totalCopies": 12,
+      "availableCopies": 12,
+      "description": "",
+      "language": "Español",
+      "pages": 121
+    }
+  ],
+  "members": [
+    {
+      "id": "1",
+      "firstName": "Juan",
+      "lastName": "Pérez",
+      "email": "juan.perez@email.com",
+      "phone": "555-0101",
+      "address": "Calle Principal 123",
+      "membershipType": "premium",
+      "membershipNumber": "12345678",
+      "active": true,
+      "joinDate": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "firstName": "María",
+      "lastName": "González",
+      "email": "maria.gonzalez@email.com",
+      "phone": "555-0102",
+      "address": "Avenida Central 456",
+      "membershipType": "basic",
+      "membershipNumber": "87654321",
+      "active": true,
+      "joinDate": "2024-02-20T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "firstName": "Carlos",
+      "lastName": "Ramírez",
+      "email": "carlos.ramirez@email.com",
+      "phone": "555-0103",
+      "address": "Boulevard Norte 789",
+      "membershipType": "premium",
+      "membershipNumber": "11223344",
+      "active": true,
+      "joinDate": "2024-03-10T00:00:00.000Z"
+    },
+    {
+      "id": "1765173398700",
+      "firstName": "Yelina",
+      "lastName": "Flores",
+      "email": "Yelina@gmail.com",
+      "phone": "903333999",
+      "address": "Su casa",
+      "membershipDate": "2025-12-08T05:56:38.700Z",
+      "membershipType": "basic",
+      "active": true,
+      "idNumber": "12345677"
+    }
+  ],
+  "employees": [
+    {
+      "id": "1",
+      "firstName": "Carlos",
+      "lastName": "Rodríguez",
+      "email": "carlos@bibliotech.com",
+      "phone": "555-0201",
+      "position": "Bibliotecario Jefe",
+      "department": "circulation",
+      "hireDate": "2020-01-15T00:00:00.000Z",
+      "salary": 45000,
+      "active": true
+    },
+    {
+      "id": "2",
+      "firstName": "Ana",
+      "lastName": "Martínez",
+      "email": "ana@bibliotech.com",
+      "phone": "555-0202",
+      "position": "Asistente de Biblioteca",
+      "department": "circulation",
+      "hireDate": "2021-06-01T00:00:00.000Z",
+      "salary": 35000,
+      "active": true
+    }
+  ],
+  "loans": [
+    {
+      "id": "1",
+      "bookId": "1",
+      "memberId": "1",
+      "loanDate": "2025-11-20T00:00:00.000Z",
+      "dueDate": "2025-12-20T00:00:00.000Z",
+      "returnDate": null,
+      "status": "active",
+      "renewalCount": 0
+    },
+    {
+      "id": "2",
+      "bookId": "2",
+      "memberId": "2",
+      "loanDate": "2025-11-25T00:00:00.000Z",
+      "dueDate": "2025-12-25T00:00:00.000Z",
+      "returnDate": null,
+      "status": "active",
+      "renewalCount": 0
+    },
+    {
+      "id": "3",
+      "bookId": "3",
+      "memberId": "1",
+      "loanDate": "2025-10-15T00:00:00.000Z",
+      "dueDate": "2025-11-15T00:00:00.000Z",
+      "returnDate": null,
+      "status": "overdue",
+      "renewalCount": 0
+    },
+    {
+      "id": "1765173421328",
+      "bookId": "4",
+      "memberId": "1765173398700",
+      "loanDate": "2025-12-08T05:57:01.328Z",
+      "dueDate": "2025-12-09T05:57:01.328Z",
+      "status": "active",
+      "employeeId": "1"
+    }
+  ],
+  "reservations": [
+    {
+      "id": "1",
+      "bookId": "4",
+      "memberId": "2",
+      "reservationDate": "2025-12-01T00:00:00.000Z",
+      "expirationDate": "2025-12-08T00:00:00.000Z",
+      "status": "pending",
+      "notified": false
+    },
+    {
+      "id": "2",
+      "bookId": "1",
+      "memberId": "3",
+      "reservationDate": "2025-12-05T00:00:00.000Z",
+      "expirationDate": "2025-12-12T00:00:00.000Z",
+      "status": "pending",
+      "notified": false
+    },
+    {
+      "id": "1765172635622",
+      "bookId": "1",
+      "memberId": "3",
+      "reservationDate": "2025-12-08T05:43:55.622Z",
+      "expirationDate": "2025-12-15T05:43:55.622Z",
+      "status": "pending",
+      "notified": false
+    },
+    {
+      "id": "1765172655729",
+      "bookId": "2",
+      "memberId": "3",
+      "reservationDate": "2025-12-08T05:44:15.729Z",
+      "expirationDate": "2025-12-15T05:44:15.729Z",
+      "status": "pending",
+      "notified": false
+    },
+    {
+      "id": "1765174515043",
+      "bookId": "4",
+      "memberId": "3",
+      "reservationDate": "2025-12-08T06:15:15.043Z",
+      "expirationDate": "2025-12-15T06:15:15.043Z",
+      "status": "pending",
+      "notified": false
+    },
+    {
+      "id": "1765174524102",
+      "bookId": "4",
+      "memberId": "3",
+      "reservationDate": "2025-12-08T06:15:24.102Z",
+      "expirationDate": "2025-12-15T06:15:24.102Z",
+      "status": "pending",
+      "notified": false
+    },
+    {
+      "id": "1765174529826",
+      "bookId": "4",
+      "memberId": "3",
+      "reservationDate": "2025-12-08T06:15:29.826Z",
+      "expirationDate": "2025-12-15T06:15:29.826Z",
+      "status": "pending",
+      "notified": false
+    }
+  ],
+  "fines": [
+    {
+      "id": "1",
+      "memberId": "1",
+      "loanId": "3",
+      "amount": 15.5,
+      "reason": "Devolución tardía",
+      "issueDate": "2025-11-16T00:00:00.000Z",
+      "dueDate": "2025-12-16T00:00:00.000Z",
+      "paymentDate": null,
+      "status": "pending"
+    },
+    {
+      "id": "2",
+      "memberId": "2",
+      "loanId": "2",
+      "amount": 5,
+      "reason": "Libro dañado",
+      "issueDate": "2025-11-28T00:00:00.000Z",
+      "dueDate": "2025-12-28T00:00:00.000Z",
+      "paymentDate": null,
+      "status": "pending"
+    }
+  ],
+  "inventory": [
+    {
+      "id": "1",
+      "bookId": "1",
+      "locationCode": "A-01-001",
+      "condition": "good",
+      "acquisitionDate": "2024-01-10T00:00:00.000Z",
+      "lastInventoryCheck": "2025-11-01T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "bookId": "2",
+      "locationCode": "A-01-002",
+      "condition": "excellent",
+      "acquisitionDate": "2024-02-15T00:00:00.000Z",
+      "lastInventoryCheck": "2025-11-01T00:00:00.000Z"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "1",
+      "name": "Distribuidora de Libros SA",
+      "contact": "José García",
+      "email": "ventas@distribuidora.com",
+      "phone": "555-0301",
+      "address": "Calle Comercio 100",
+      "specialization": "Libros de texto"
+    },
+    {
+      "id": "2",
+      "name": "Editorial y Distribución",
+      "contact": "Laura Fernández",
+      "email": "contacto@editorial.com",
+      "phone": "555-0302",
+      "address": "Avenida Literatura 250",
+      "specialization": "Novelas y ficción"
+    }
+  ]
+}

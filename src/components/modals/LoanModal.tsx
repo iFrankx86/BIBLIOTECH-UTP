@@ -2,21 +2,22 @@ import { Modal, Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useAuth } from '../../context/AuthContext';
-import { Loan } from '../../models';
+import { Loan, Book, Member } from '../../models';
 
 interface LoanModalProps {
   show: boolean;
   onHide: () => void;
+  loan?: Loan;
 }
 
-const LoanModal = ({ show, onHide }: LoanModalProps) => {
-  const { addLoan, books, members, employees } = useData();
+const LoanModal = ({ show, onHide, loan }: LoanModalProps) => {
+  const { addLoan, updateLoan, books, members, employees } = useData();
   const { user } = useAuth();
   
   const [formData, setFormData] = useState({
-    bookId: '',
-    memberId: '',
-    loanDays: 14,
+    bookId: loan?.bookId || '',
+    memberId: loan?.memberId || '',
+    loanDays: loan ? Math.ceil((new Date(loan.dueDate).getTime() - new Date(loan.loanDate).getTime()) / (1000 * 60 * 60 * 24)) : 14,
   });
 
   const [error, setError] = useState('');
@@ -25,30 +26,44 @@ const LoanModal = ({ show, onHide }: LoanModalProps) => {
     e.preventDefault();
     setError('');
 
-    const selectedBook = books.find(b => b.id === formData.bookId);
-    if (selectedBook && selectedBook.availableCopies <= 0) {
+    const selectedBook = books.find((b: Book) => b.id === formData.bookId);
+    if (!loan && selectedBook && selectedBook.availableCopies <= 0) {
       setError('No hay copias disponibles de este libro');
       return;
     }
 
-    const loanDate = new Date();
-    const dueDate = new Date();
+    const loanDate = loan ? new Date(loan.loanDate) : new Date();
+    const dueDate = new Date(loanDate);
     dueDate.setDate(dueDate.getDate() + formData.loanDays);
 
-    const newLoan = new Loan(
-      Date.now().toString(),
-      formData.bookId,
-      formData.memberId,
-      loanDate,
-      dueDate,
-      employees[0]?.id || user?.id || '1'
-    );
-
-    addLoan(newLoan);
-    
-    // Actualizar copias disponibles
-    if (selectedBook) {
-      selectedBook.availableCopies--;
+    if (loan) {
+      // Update existing loan
+      const updatedLoan = new Loan(
+        loan.id,
+        formData.bookId,
+        formData.memberId,
+        loanDate,
+        dueDate,
+        loan.employeeId
+      );
+      updatedLoan.returnDate = loan.returnDate;
+      updateLoan(updatedLoan);
+    } else {
+      // Create new loan
+      const newLoan = new Loan(
+        Date.now().toString(),
+        formData.bookId,
+        formData.memberId,
+        loanDate,
+        dueDate,
+        employees[0]?.id || user?.id || '1'
+      );
+      addLoan(newLoan);
+      
+      // Actualizar copias disponibles
+      if (selectedBook) {
+        selectedBook.availableCopies--;
+      }
     }
 
     onHide();
@@ -60,7 +75,7 @@ const LoanModal = ({ show, onHide }: LoanModalProps) => {
       <Modal.Header closeButton>
         <Modal.Title>
           <i className="bi bi-arrow-right-circle me-2"></i>
-          Registrar Préstamo
+          {loan ? 'Editar Préstamo' : 'Registrar Préstamo'}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -76,8 +91,8 @@ const LoanModal = ({ show, onHide }: LoanModalProps) => {
             >
               <option value="">Seleccionar libro</option>
               {books
-                .filter(book => book.availableCopies > 0)
-                .map((book) => (
+                .filter((book: Book) => book.availableCopies > 0)
+                .map((book: Book) => (
                   <option key={book.id} value={book.id}>
                     {book.title} (Disponibles: {book.availableCopies})
                   </option>
@@ -93,7 +108,7 @@ const LoanModal = ({ show, onHide }: LoanModalProps) => {
               required
             >
               <option value="">Seleccionar miembro</option>
-              {members.map((member) => (
+              {members.map((member: Member) => (
                 <option key={member.id} value={member.id}>
                   {member.fullName} - {member.email}
                 </option>

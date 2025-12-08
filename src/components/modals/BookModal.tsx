@@ -1,7 +1,7 @@
 import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
 import { useState } from 'react';
 import { useData } from '../../context/DataContext';
-import { Book } from '../../models';
+import { Book, Author, Publisher, Category } from '../../models';
 
 interface BookModalProps {
   show: boolean;
@@ -11,6 +11,7 @@ interface BookModalProps {
 
 const BookModal = ({ show, onHide, book }: BookModalProps) => {
   const { addBook, updateBook, authors, publishers, categories } = useData();
+  const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     title: book?.title || '',
@@ -25,30 +26,42 @@ const BookModal = ({ show, onHide, book }: BookModalProps) => {
     pages: book?.pages || 0,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    const newBook = new Book(
-      book?.id || Date.now().toString(),
-      formData.title,
-      formData.isbn,
-      formData.authorId,
-      formData.publisherId,
-      formData.categoryId,
-      formData.publicationYear,
-      formData.totalCopies,
-      formData.description,
-      formData.language,
-      formData.pages
-    );
+    try {
+      const newBook = new Book(
+        book?.id || Date.now().toString(),
+        formData.title,
+        formData.isbn,
+        formData.authorId,
+        formData.publisherId,
+        formData.categoryId,
+        formData.publicationYear,
+        formData.totalCopies,
+        formData.description,
+        formData.language,
+        formData.pages
+      );
 
-    if (book) {
-      updateBook(newBook);
-    } else {
-      addBook(newBook);
+      if (book) {
+        // Mantener las copias disponibles existentes
+        newBook.availableCopies = book.availableCopies;
+        await updateBook(newBook);
+      } else {
+        // Nuevos libros tienen todas las copias disponibles
+        newBook.availableCopies = formData.totalCopies;
+        await addBook(newBook);
+      }
+
+      onHide();
+    } catch (error) {
+      console.error('Error al guardar el libro:', error);
+      alert('Error al guardar el libro. Por favor, intenta de nuevo.');
+    } finally {
+      setLoading(false);
     }
-
-    onHide();
   };
 
   return (
@@ -96,7 +109,7 @@ const BookModal = ({ show, onHide, book }: BookModalProps) => {
                   required
                 >
                   <option value="">Seleccionar autor</option>
-                  {authors.map((author) => (
+                  {authors.map((author: Author) => (
                     <option key={author.id} value={author.id}>
                       {author.fullName}
                     </option>
@@ -113,7 +126,7 @@ const BookModal = ({ show, onHide, book }: BookModalProps) => {
                   required
                 >
                   <option value="">Seleccionar editorial</option>
-                  {publishers.map((publisher) => (
+                  {publishers.map((publisher: Publisher) => (
                     <option key={publisher.id} value={publisher.id}>
                       {publisher.name}
                     </option>
@@ -133,7 +146,7 @@ const BookModal = ({ show, onHide, book }: BookModalProps) => {
                   required
                 >
                   <option value="">Seleccionar categoría</option>
-                  {categories.map((category) => (
+                  {categories.map((category: Category) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
                     </option>
@@ -205,8 +218,15 @@ const BookModal = ({ show, onHide, book }: BookModalProps) => {
             <Button variant="secondary" onClick={onHide}>
               Cancelar
             </Button>
-            <Button variant="primary" type="submit">
-              {book ? 'Actualizar' : 'Guardar'}
+            <Button variant="primary" type="submit" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Guardando...
+                </>
+              ) : (
+                book ? 'Actualizar' : 'Guardar'
+              )}
             </Button>
           </div>
         </Form>

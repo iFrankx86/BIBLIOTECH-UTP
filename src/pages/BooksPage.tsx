@@ -1,26 +1,28 @@
 import { useState } from 'react';
 import { Card, Table, Button, Badge } from 'react-bootstrap';
 import { useData } from '../context/DataContext';
-import { Book } from '../models';
+import { usePermissions } from '../hooks/usePermissions';
+import { Book, Author, Publisher, Category } from '../models';
 import BookModal from '../components/modals/BookModal';
 
 const BooksPage = () => {
   const { books, authors, publishers, categories } = useData();
+  const { hasPermission, role } = usePermissions();
   const [showModal, setShowModal] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
   const getAuthorName = (authorId: string) => {
-    const author = authors.find(a => a.id === authorId);
+    const author = authors.find((a: Author) => a.id === authorId);
     return author ? author.fullName : 'Desconocido';
   };
 
   const getPublisherName = (publisherId: string) => {
-    const publisher = publishers.find(p => p.id === publisherId);
+    const publisher = publishers.find((p: Publisher) => p.id === publisherId);
     return publisher ? publisher.name : 'Desconocida';
   };
 
   const getCategoryName = (categoryId: string) => {
-    const category = categories.find(c => c.id === categoryId);
+    const category = categories.find((c: Category) => c.id === categoryId);
     return category ? category.name : 'Sin categoría';
   };
 
@@ -28,13 +30,19 @@ const BooksPage = () => {
     <>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2>📚 Gestión de Libros</h2>
-          <p className="text-muted">Administra el catálogo de libros de la biblioteca</p>
+          <h2>📚 {role === 'member' ? 'Catálogo de Libros' : 'Gestión de Libros'}</h2>
+          <p className="text-muted">
+            {role === 'member' 
+              ? 'Explora el catálogo de libros disponibles en la biblioteca' 
+              : 'Administra el catálogo de libros de la biblioteca'}
+          </p>
         </div>
-        <Button variant="primary" onClick={() => { setSelectedBook(null); setShowModal(true); }}>
-          <i className="bi bi-plus-circle me-2"></i>
-          Nuevo Libro
-        </Button>
+        {hasPermission('canManageBooks') && (
+          <Button variant="primary" onClick={() => { setSelectedBook(null); setShowModal(true); }}>
+            <i className="bi bi-plus-circle me-2"></i>
+            Nuevo Libro
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -54,7 +62,7 @@ const BooksPage = () => {
               </tr>
             </thead>
             <tbody>
-              {books.map((book) => (
+              {books.map((book: Book) => (
                 <tr key={book.id}>
                   <td><strong>{book.title}</strong></td>
                   <td><code>{book.isbn}</code></td>
@@ -71,14 +79,24 @@ const BooksPage = () => {
                     </Badge>
                   </td>
                   <td>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => { setSelectedBook(book); setShowModal(true); }}
-                    >
-                      <i className="bi bi-pencil"></i>
-                    </Button>
+                    {hasPermission('canManageBooks') ? (
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        className="me-2"
+                        onClick={() => { setSelectedBook(book); setShowModal(true); }}
+                      >
+                        <i className="bi bi-pencil"></i>
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline-info"
+                        size="sm"
+                        title="Ver detalles"
+                      >
+                        <i className="bi bi-eye"></i>
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))}

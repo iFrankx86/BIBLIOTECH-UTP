@@ -1,77 +1,55 @@
 import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
 import { useState } from 'react';
 import { useData } from '../../context/DataContext';
-import { Member } from '../../models';
+import { Publisher } from '../../models';
 
-interface MemberModalProps {
+interface PublisherModalProps {
   show: boolean;
   onHide: () => void;
-  member?: Member;
+  publisher?: Publisher | null;
 }
 
-const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
-  const { addMember, updateMember } = useData();
+const PublisherModal = ({ show, onHide, publisher }: PublisherModalProps) => {
+  const { addPublisher, updatePublisher } = useData();
   
   const [formData, setFormData] = useState({
-    firstName: member?.firstName || '',
-    lastName: member?.lastName || '',
-    email: member?.email || '',
-    phone: member?.phone || '',
-    address: member?.address || '',
-    membershipType: (member?.membershipType || 'basic') as 'basic' | 'premium' | 'vip',
-    idNumber: member?.idNumber || '',
+    name: publisher?.name || '',
+    country: publisher?.country || '',
+    email: publisher?.email || '',
+    phone: publisher?.phone || '',
+    website: publisher?.website || '',
+    address: publisher?.address || '',
+    foundedYear: publisher?.foundedYear || new Date().getFullYear(),
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (member) {
-      // Update existing member
-      const updatedMember = new Member(
-        member.id,
-        formData.firstName,
-        formData.lastName,
-        formData.email,
-        formData.phone,
-        formData.address,
-        formData.membershipType,
-        formData.idNumber
-      );
-      updatedMember.membershipDate = member.membershipDate;
-      updateMember(updatedMember);
+    const newPublisher = new Publisher(
+      publisher?.id || Date.now().toString(),
+      formData.name,
+      formData.country,
+      formData.website,
+      formData.email,
+      formData.phone,
+      formData.address,
+      formData.foundedYear
+    );
+
+    if (publisher) {
+      await updatePublisher(newPublisher);
     } else {
-      // Create new member
-      const newMember = new Member(
-        Date.now().toString(),
-        formData.firstName,
-        formData.lastName,
-        formData.email,
-        formData.phone,
-        formData.address,
-        formData.membershipType,
-        formData.idNumber
-      );
-      addMember(newMember);
+      await addPublisher(newPublisher);
     }
-    
     onHide();
-    setFormData({
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      address: '',
-      membershipType: 'basic',
-      idNumber: '',
-    });
   };
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
         <Modal.Title>
-          <i className="bi bi-person-plus me-2"></i>
-          {member ? 'Editar Miembro' : 'Agregar Nuevo Miembro'}
+          <i className="bi bi-building me-2"></i>
+          {publisher ? 'Editar Editorial' : 'Registrar Nueva Editorial'}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -82,19 +60,19 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
                 <Form.Label>Nombre *</Form.Label>
                 <Form.Control
                   type="text"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
               </Form.Group>
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Apellido *</Form.Label>
+                <Form.Label>País *</Form.Label>
                 <Form.Control
                   type="text"
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                  value={formData.country}
+                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                   required
                 />
               </Form.Group>
@@ -129,38 +107,34 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Número de Identificación *</Form.Label>
+                <Form.Label>Sitio Web</Form.Label>
                 <Form.Control
-                  type="text"
-                  value={formData.idNumber}
-                  onChange={(e) => setFormData({ ...formData, idNumber: e.target.value })}
-                  required
+                  type="url"
+                  value={formData.website}
+                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                  placeholder="https://ejemplo.com"
                 />
               </Form.Group>
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Tipo de Membresía *</Form.Label>
-                <Form.Select
-                  value={formData.membershipType}
-                  onChange={(e) => setFormData({ ...formData, membershipType: e.target.value as 'basic' | 'premium' | 'vip' })}
+                <Form.Label>Año de Fundación *</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={formData.foundedYear}
+                  onChange={(e) => setFormData({ ...formData, foundedYear: parseInt(e.target.value) })}
                   required
-                >
-                  <option value="basic">Básica</option>
-                  <option value="premium">Premium</option>
-                  <option value="vip">VIP</option>
-                </Form.Select>
+                />
               </Form.Group>
             </Col>
           </Row>
 
           <Form.Group className="mb-3">
-            <Form.Label>Dirección *</Form.Label>
+            <Form.Label>Dirección</Form.Label>
             <Form.Control
               type="text"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              required
             />
           </Form.Group>
 
@@ -169,7 +143,7 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
               Cancelar
             </Button>
             <Button variant="primary" type="submit">
-              {member ? 'Actualizar' : 'Guardar'} Miembro
+              {publisher ? 'Actualizar' : 'Guardar'}
             </Button>
           </div>
         </Form>
@@ -178,4 +152,4 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
   );
 };
 
-export default MemberModal;
+export default PublisherModal;

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { DataProvider } from './context/DataContext';
 import PrivateRoute from './components/PrivateRoute';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -9,6 +10,13 @@ import BooksPage from './pages/BooksPage';
 import MembersPage from './pages/MembersPage';
 import LoansPage from './pages/LoansPage';
 import CategoriesPage from './pages/CategoriesPage';
+import AuthorsPage from './pages/AuthorsPage';
+import PublishersPage from './pages/PublishersPage';
+import EmployeesPage from './pages/EmployeesPage';
+import ReservationsPage from './pages/ReservationsPage';
+import FinesPage from './pages/FinesPage';
+import InventoryPage from './pages/InventoryPage';
+import SuppliersPage from './pages/SuppliersPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './styles/App.css';
@@ -30,17 +38,75 @@ function App() {
             >
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
-              <Route path="books" element={<BooksPage />} />
-              <Route path="members" element={<MembersPage />} />
-              <Route path="loans" element={<LoansPage />} />
-              <Route path="categories" element={<CategoriesPage />} />
-              <Route path="authors" element={<div className="text-center py-5"><h3>Página de Autores</h3><p className="text-muted">En desarrollo</p></div>} />
-              <Route path="publishers" element={<div className="text-center py-5"><h3>Página de Editoriales</h3><p className="text-muted">En desarrollo</p></div>} />
-              <Route path="employees" element={<div className="text-center py-5"><h3>Página de Empleados</h3><p className="text-muted">En desarrollo</p></div>} />
-              <Route path="reservations" element={<div className="text-center py-5"><h3>Página de Reservas</h3><p className="text-muted">En desarrollo</p></div>} />
-              <Route path="fines" element={<div className="text-center py-5"><h3>Página de Multas</h3><p className="text-muted">En desarrollo</p></div>} />
-              <Route path="inventory" element={<div className="text-center py-5"><h3>Página de Inventario</h3><p className="text-muted">En desarrollo</p></div>} />
-              <Route path="suppliers" element={<div className="text-center py-5"><h3>Página de Proveedores</h3><p className="text-muted">En desarrollo</p></div>} />
+              
+              {/* Rutas con permisos - Admin y Bibliotecario pueden gestionar libros */}
+              <Route path="books" element={
+                <ProtectedRoute allowedRoles={['admin', 'librarian', 'member']}>
+                  <BooksPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Solo Admin y Bibliotecario pueden gestionar miembros */}
+              <Route path="members" element={
+                <ProtectedRoute allowedRoles={['admin', 'librarian']}>
+                  <MembersPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Admin y Bibliotecario pueden gestionar préstamos */}
+              <Route path="loans" element={
+                <ProtectedRoute allowedRoles={['admin', 'librarian']}>
+                  <LoansPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Admin y Bibliotecario pueden gestionar categorías */}
+              <Route path="categories" element={
+                <ProtectedRoute allowedRoles={['admin', 'librarian']}>
+                  <CategoriesPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Admin y Bibliotecario pueden gestionar autores */}
+              <Route path="authors" element={
+                <ProtectedRoute allowedRoles={['admin', 'librarian']}>
+                  <AuthorsPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Admin y Bibliotecario pueden gestionar editoriales */}
+              <Route path="publishers" element={
+                <ProtectedRoute allowedRoles={['admin', 'librarian']}>
+                  <PublishersPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Solo Admin puede gestionar empleados */}
+              <Route path="employees" element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <EmployeesPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Todos pueden ver reservas (miembros las suyas, staff todas) */}
+              <Route path="reservations" element={<ReservationsPage />} />
+              
+              {/* Admin y Bibliotecario gestionan multas, miembros ven las suyas */}
+              <Route path="fines" element={<FinesPage />} />
+              
+              {/* Solo Admin puede gestionar inventario */}
+              <Route path="inventory" element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <InventoryPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Solo Admin puede gestionar proveedores */}
+              <Route path="suppliers" element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <SuppliersPage />
+                </ProtectedRoute>
+              } />
             </Route>
           </Routes>
         </Router>

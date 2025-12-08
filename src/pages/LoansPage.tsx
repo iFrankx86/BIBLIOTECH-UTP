@@ -1,16 +1,17 @@
 import { Card, Table, Badge } from 'react-bootstrap';
 import { useData } from '../context/DataContext';
+import { Loan, Book, Member } from '../models';
 
 const LoansPage = () => {
   const { loans, books, members } = useData();
 
   const getBookTitle = (bookId: string) => {
-    const book = books.find(b => b.id === bookId);
+    const book = books.find((b: Book) => b.id === bookId);
     return book ? book.title : 'Libro no encontrado';
   };
 
   const getMemberName = (memberId: string) => {
-    const member = members.find(m => m.id === memberId);
+    const member = members.find((m: Member) => m.id === memberId);
     return member ? member.fullName : 'Miembro no encontrado';
   };
 
@@ -36,14 +37,14 @@ const LoansPage = () => {
               </tr>
             </thead>
             <tbody>
-              {loans.map((loan) => (
+              {loans.map((loan: Loan) => (
                 <tr key={loan.id}>
                   <td><code>#{loan.id}</code></td>
                   <td>{getBookTitle(loan.bookId)}</td>
                   <td>{getMemberName(loan.memberId)}</td>
-                  <td>{loan.loanDate.toLocaleDateString()}</td>
-                  <td>{loan.dueDate.toLocaleDateString()}</td>
-                  <td>{loan.returnDate ? loan.returnDate.toLocaleDateString() : '-'}</td>
+                  <td>{new Date(loan.loanDate).toLocaleDateString()}</td>
+                  <td>{new Date(loan.dueDate).toLocaleDateString()}</td>
+                  <td>{loan.returnDate ? new Date(loan.returnDate).toLocaleDateString() : '-'}</td>
                   <td>
                     <Badge bg={
                       loan.status === 'returned' ? 'success' :

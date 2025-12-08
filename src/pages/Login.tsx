@@ -7,17 +7,46 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const quickLogin = async (user: string, pass: string) => {
+    setUsername(user);
+    setPassword(pass);
+    setError('');
+    setLoading(true);
+
+    try {
+      const success = await login(user, pass);
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        setError('Usuario o contraseña incorrectos');
+      }
+    } catch (err) {
+      setError('Error al conectar con el servidor. Asegúrate de que json-server esté corriendo.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    if (login(username, password)) {
-      navigate('/dashboard');
-    } else {
-      setError('Usuario o contraseña incorrectos');
+    try {
+      const success = await login(username, password);
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        setError('Usuario o contraseña incorrectos');
+      }
+    } catch (err) {
+      setError('Error al conectar con el servidor. Asegúrate de que json-server esté corriendo.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,19 +87,62 @@ const Login = () => {
                   />
                 </Form.Group>
 
-                <Button variant="primary" type="submit" className="w-100 mb-3">
-                  Iniciar Sesión
+                <Button variant="primary" type="submit" className="w-100 mb-3" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Iniciando sesión...
+                    </>
+                  ) : (
+                    'Iniciar Sesión'
+                  )}
                 </Button>
               </Form>
 
-              <Card className="bg-light mt-4">
-                <Card.Body className="p-3">
-                  <p className="text-muted mb-2 small"><strong>Usuarios de prueba:</strong></p>
-                  <p className="mb-1 small">👤 Admin: <code>admin / admin123</code></p>
-                  <p className="mb-1 small">👤 Bibliotecario: <code>librarian / lib123</code></p>
-                  <p className="mb-0 small">👤 Miembro: <code>member / mem123</code></p>
-                </Card.Body>
-              </Card>
+              <div className="mt-4">
+                <p className="text-muted mb-3 text-center"><strong>Inicio Rápido:</strong></p>
+                <Row className="g-2">
+                  <Col md={4}>
+                    <Card 
+                      className="text-center cursor-pointer hover-shadow"
+                      style={{ cursor: 'pointer', transition: 'all 0.3s' }}
+                      onClick={() => quickLogin('admin', 'admin123')}
+                    >
+                      <Card.Body className="p-3">
+                        <i className="bi bi-shield-lock-fill text-danger" style={{ fontSize: '2rem' }}></i>
+                        <h6 className="mt-2 mb-1">Admin</h6>
+                        <small className="text-muted">Acceso total</small>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                  <Col md={4}>
+                    <Card 
+                      className="text-center cursor-pointer hover-shadow"
+                      style={{ cursor: 'pointer', transition: 'all 0.3s' }}
+                      onClick={() => quickLogin('librarian', 'lib123')}
+                    >
+                      <Card.Body className="p-3">
+                        <i className="bi bi-book-half text-primary" style={{ fontSize: '2rem' }}></i>
+                        <h6 className="mt-2 mb-1">Bibliotecario</h6>
+                        <small className="text-muted">Gestión general</small>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                  <Col md={4}>
+                    <Card 
+                      className="text-center cursor-pointer hover-shadow"
+                      style={{ cursor: 'pointer', transition: 'all 0.3s' }}
+                      onClick={() => quickLogin('member', 'mem123')}
+                    >
+                      <Card.Body className="p-3">
+                        <i className="bi bi-person-circle text-success" style={{ fontSize: '2rem' }}></i>
+                        <h6 className="mt-2 mb-1">Miembro</h6>
+                        <small className="text-muted">Consulta</small>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+              </div>
             </Card.Body>
           </Card>
         </Col>

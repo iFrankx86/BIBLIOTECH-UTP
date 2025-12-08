@@ -1,5 +1,6 @@
 import { Card, Table, Badge } from 'react-bootstrap';
 import { useData } from '../context/DataContext';
+import { Member } from '../models';
 
 const MembersPage = () => {
   const { members } = useData();
@@ -26,7 +27,7 @@ const MembersPage = () => {
               </tr>
             </thead>
             <tbody>
-              {members.map((member) => (
+              {members.map((member: Member) => (
                 <tr key={member.id}>
                   <td><code>{member.idNumber}</code></td>
                   <td><strong>{member.fullName}</strong></td>
@@ -40,7 +41,7 @@ const MembersPage = () => {
                       {member.membershipType.toUpperCase()}
                     </Badge>
                   </td>
-                  <td>{member.membershipDate.toLocaleDateString()}</td>
+                  <td>{new Date(member.membershipDate).toLocaleDateString()}</td>
                   <td>
                     <Badge bg={member.active ? 'success' : 'danger'}>
                       {member.active ? 'Activo' : 'Inactivo'}

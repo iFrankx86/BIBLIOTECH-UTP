@@ -1,24 +1,34 @@
 import { Row, Col, Card } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
-import { useData } from '../context/DataContext';
+
 import { useState } from 'react';
+import { usePermissions } from '../hooks/usePermissions';
 import BookModal from '../components/modals/BookModal';
 import LoanModal from '../components/modals/LoanModal';
 import MemberModal from '../components/modals/MemberModal';
+import MemberDashboard from './MemberDashboard';
+import { Book, Loan, Fine, Reservation } from '../models';
+import { useData } from '../context/DataContext';
 
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { hasPermission, role } = usePermissions();
   const { books, members, loans, reservations, fines } = useData();
   
   const [showBookModal, setShowBookModal] = useState(false);
   const [showLoanModal, setShowLoanModal] = useState(false);
   const [showMemberModal, setShowMemberModal] = useState(false);
 
-  const availableBooks = books.reduce((sum, book) => sum + book.availableCopies, 0);
-  const activeLoans = loans.filter(loan => loan.status === 'active').length;
-  const overdueLoans = loans.filter(loan => loan.status === 'overdue').length;
-  const pendingFines = fines.filter(fine => fine.status === 'pending').length;
+  // Si es miembro, mostrar dashboard específico para miembros
+  if (role === 'member') {
+    return <MemberDashboard />;
+  }
+
+  const availableBooks = books.reduce((sum: number, book: Book) => sum + book.availableCopies, 0);
+  const activeLoans = loans.filter((loan: Loan) => loan.status === 'active').length;
+  const overdueLoans = loans.filter((loan: Loan) => loan.status === 'overdue').length;
+  const pendingFines = fines.filter((fine: Fine) => fine.status === 'pending').length;
 
   const currentHour = new Date().getHours();
   let greeting = 'Buenos días';
@@ -29,7 +39,11 @@ const Dashboard = () => {
     <>
       <div className="mb-4">
         <h2 className="mb-1">{greeting}, {user?.fullName}!</h2>
-        <p className="text-muted">Bienvenido al Sistema de Gestión BiblioTech</p>
+        <p className="text-muted">
+          Bienvenido al Sistema de Gestión BiblioTech 
+          {role === 'admin' && ' - Panel de Administrador'}
+          {role === 'librarian' && ' - Panel de Bibliotecario'}
+        </p>
       </div>
 
       <Row className="mb-4">
@@ -102,24 +116,30 @@ const Dashboard = () => {
             </Card.Header>
             <Card.Body>
               <div className="d-grid gap-2">
-                <button 
-                  className="btn btn-outline-primary text-start"
-                  onClick={() => setShowBookModal(true)}
-                >
-                  <i className="bi bi-book me-2"></i>Registrar Nuevo Libro
-                </button>
-                <button 
-                  className="btn btn-outline-success text-start"
-                  onClick={() => setShowLoanModal(true)}
-                >
-                  <i className="bi bi-arrow-right-circle me-2"></i>Registrar Préstamo
-                </button>
-                <button 
-                  className="btn btn-outline-info text-start"
-                  onClick={() => setShowMemberModal(true)}
-                >
-                  <i className="bi bi-person-plus me-2"></i>Agregar Miembro
-                </button>
+                {hasPermission('canManageBooks') && (
+                  <button 
+                    className="btn btn-outline-primary text-start"
+                    onClick={() => setShowBookModal(true)}
+                  >
+                    <i className="bi bi-book me-2"></i>Registrar Nuevo Libro
+                  </button>
+                )}
+                {hasPermission('canManageLoans') && (
+                  <button 
+                    className="btn btn-outline-success text-start"
+                    onClick={() => setShowLoanModal(true)}
+                  >
+                    <i className="bi bi-arrow-right-circle me-2"></i>Registrar Préstamo
+                  </button>
+                )}
+                {hasPermission('canManageMembers') && (
+                  <button 
+                    className="btn btn-outline-info text-start"
+                    onClick={() => setShowMemberModal(true)}
+                  >
+                    <i className="bi bi-person-plus me-2"></i>Agregar Miembro
+                  </button>
+                )}
               </div>
             </Card.Body>
           </Card>
@@ -134,7 +154,7 @@ const Dashboard = () => {
               <ul className="list-unstyled mb-0">
                 <li className="mb-2">
                   <i className="bi bi-check-circle text-success me-2"></i>
-                  <strong>Reservas pendientes:</strong> {reservations.filter(r => r.status === 'pending').length}
+                  <strong>Reservas pendientes:</strong> {reservations.filter((r: Reservation) => r.status === 'pending').length}
                 </li>
                 <li className="mb-2">
                   <i className="bi bi-check-circle text-success me-2"></i>
