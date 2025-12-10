@@ -1,15 +1,58 @@
-import { Card, Table, Badge } from 'react-bootstrap';
+import { useState } from 'react';
+import { Card, Table, Badge, Button, ButtonGroup } from 'react-bootstrap';
 import { useData } from '../context/DataContext';
+import { usePermissions } from '../hooks/usePermissions';
 import { Member } from '../models';
+import MemberModal from '../components/modals/MemberModal';
 
 const MembersPage = () => {
-  const { members } = useData();
+  const { members, deleteMember, updateMember } = useData();
+  const { hasPermission } = usePermissions();
+  const [showModal, setShowModal] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('create');
+
+  const formatDate = (dateValue: Date | string) => {
+    const parsed = new Date(dateValue);
+    return Number.isNaN(parsed.getTime()) ? 'Sin fecha' : parsed.toLocaleDateString();
+  };
+
+  const toggleActive = async (member: Member) => {
+    const updated = new Member(
+      member.id,
+      member.firstName,
+      member.lastName,
+      member.email,
+      member.phone,
+      member.address,
+      member.membershipType,
+      member.idNumber,
+      !member.active
+    );
+    updated.membershipDate = member.membershipDate;
+    await updateMember(updated);
+  };
 
   return (
     <>
-      <div className="mb-4">
-        <h2>👥 Gestión de Miembros</h2>
-        <p className="text-muted">Administra los miembros de la biblioteca</p>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2>👥 Gestión de Miembros</h2>
+          <p className="text-muted">Administra los miembros de la biblioteca</p>
+        </div>
+        {hasPermission('canManageMembers') && (
+          <Button
+            variant="primary"
+            onClick={() => {
+              setSelectedMember(null);
+              setModalMode('create');
+              setShowModal(true);
+            }}
+          >
+            <i className="bi bi-plus-circle me-2"></i>
+            Nuevo Miembro
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -24,6 +67,7 @@ const MembersPage = () => {
                 <th>Tipo de Membresía</th>
                 <th>Fecha de Registro</th>
                 <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -41,11 +85,60 @@ const MembersPage = () => {
                       {member.membershipType.toUpperCase()}
                     </Badge>
                   </td>
-                  <td>{new Date(member.membershipDate).toLocaleDateString()}</td>
+                  <td>{formatDate(member.membershipDate)}</td>
                   <td>
-                    <Badge bg={member.active ? 'success' : 'danger'}>
-                      {member.active ? 'Activo' : 'Inactivo'}
-                    </Badge>
+                    <div className="d-flex align-items-center gap-2">
+                      <Badge bg={member.active ? 'success' : 'danger'}>
+                        {member.active ? 'Activo' : 'Inactivo'}
+                      </Badge>
+                      {hasPermission('canManageMembers') && (
+                        <Button
+                          size="sm"
+                          variant={member.active ? 'outline-danger' : 'outline-success'}
+                          onClick={() => toggleActive(member)}
+                        >
+                          {member.active ? 'Desactivar' : 'Activar'}
+                        </Button>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <ButtonGroup size="sm">
+                      <Button
+                        variant="outline-info"
+                        onClick={() => {
+                          setSelectedMember(member);
+                          setModalMode('view');
+                          setShowModal(true);
+                        }}
+                      >
+                        <i className="bi bi-eye"></i>
+                      </Button>
+                      {hasPermission('canManageMembers') && (
+                        <>
+                          <Button
+                            variant="outline-primary"
+                            onClick={() => {
+                              setSelectedMember(member);
+                              setModalMode('edit');
+                              setShowModal(true);
+                            }}
+                          >
+                            <i className="bi bi-pencil"></i>
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            onClick={() => {
+                              if (window.confirm('¿Eliminar este miembro?')) {
+                                deleteMember(member.id);
+                              }
+                            }}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </Button>
+                        </>
+                      )}
+                    </ButtonGroup>
                   </td>
                 </tr>
               ))}
@@ -59,6 +152,13 @@ const MembersPage = () => {
           )}
         </Card.Body>
       </Card>
+
+      <MemberModal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        member={selectedMember ?? undefined}
+        readOnly={modalMode === 'view'}
+      />
     </>
   );
 };

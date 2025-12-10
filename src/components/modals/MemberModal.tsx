@@ -1,5 +1,5 @@
 import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { Member } from '../../models';
 
@@ -7,9 +7,10 @@ interface MemberModalProps {
   show: boolean;
   onHide: () => void;
   member?: Member;
+  readOnly?: boolean;
 }
 
-const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
+const MemberModal = ({ show, onHide, member, readOnly = false }: MemberModalProps) => {
   const { addMember, updateMember } = useData();
   
   const [formData, setFormData] = useState({
@@ -20,10 +21,28 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
     address: member?.address || '',
     membershipType: (member?.membershipType || 'basic') as 'basic' | 'premium' | 'vip',
     idNumber: member?.idNumber || '',
+    active: member?.active ?? true,
   });
+
+  useEffect(() => {
+    setFormData({
+      firstName: member?.firstName || '',
+      lastName: member?.lastName || '',
+      email: member?.email || '',
+      phone: member?.phone || '',
+      address: member?.address || '',
+      membershipType: (member?.membershipType || 'basic') as 'basic' | 'premium' | 'vip',
+      idNumber: member?.idNumber || '',
+      active: member?.active ?? true,
+    });
+  }, [member, show]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (readOnly) {
+      onHide();
+      return;
+    }
     
     if (member) {
       // Update existing member
@@ -35,7 +54,8 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
         formData.phone,
         formData.address,
         formData.membershipType,
-        formData.idNumber
+        formData.idNumber,
+        formData.active
       );
       updatedMember.membershipDate = member.membershipDate;
       updateMember(updatedMember);
@@ -49,7 +69,8 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
         formData.phone,
         formData.address,
         formData.membershipType,
-        formData.idNumber
+        formData.idNumber,
+        formData.active
       );
       addMember(newMember);
     }
@@ -63,15 +84,18 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
       address: '',
       membershipType: 'basic',
       idNumber: '',
+      active: true,
     });
   };
+
+  const modalTitle = member ? (readOnly ? 'Detalle de Miembro' : 'Editar Miembro') : 'Agregar Nuevo Miembro';
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
         <Modal.Title>
           <i className="bi bi-person-plus me-2"></i>
-          {member ? 'Editar Miembro' : 'Agregar Nuevo Miembro'}
+          {modalTitle}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -85,6 +109,7 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                   required
+                  disabled={readOnly}
                 />
               </Form.Group>
             </Col>
@@ -96,6 +121,7 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                   required
+                  disabled={readOnly}
                 />
               </Form.Group>
             </Col>
@@ -110,6 +136,7 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
+                  disabled={readOnly}
                 />
               </Form.Group>
             </Col>
@@ -121,6 +148,7 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   required
+                  disabled={readOnly}
                 />
               </Form.Group>
             </Col>
@@ -135,6 +163,7 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
                   value={formData.idNumber}
                   onChange={(e) => setFormData({ ...formData, idNumber: e.target.value })}
                   required
+                  disabled={readOnly}
                 />
               </Form.Group>
             </Col>
@@ -145,6 +174,7 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
                   value={formData.membershipType}
                   onChange={(e) => setFormData({ ...formData, membershipType: e.target.value as 'basic' | 'premium' | 'vip' })}
                   required
+                  disabled={readOnly}
                 >
                   <option value="basic">Básica</option>
                   <option value="premium">Premium</option>
@@ -161,16 +191,30 @@ const MemberModal = ({ show, onHide, member }: MemberModalProps) => {
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               required
+              disabled={readOnly}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-4">
+            <Form.Check
+              type="switch"
+              id="member-active"
+              label={formData.active ? 'Miembro Activo' : 'Miembro Inactivo'}
+              checked={formData.active}
+              onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
+              disabled={readOnly}
             />
           </Form.Group>
 
           <div className="d-flex justify-content-end gap-2">
             <Button variant="secondary" onClick={onHide}>
-              Cancelar
+              {readOnly ? 'Cerrar' : 'Cancelar'}
             </Button>
-            <Button variant="primary" type="submit">
-              {member ? 'Actualizar' : 'Guardar'} Miembro
-            </Button>
+            {!readOnly && (
+              <Button variant="primary" type="submit">
+                {member ? 'Actualizar' : 'Guardar'} Miembro
+              </Button>
+            )}
           </div>
         </Form>
       </Modal.Body>

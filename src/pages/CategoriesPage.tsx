@@ -1,24 +1,38 @@
 import { useState } from 'react';
-import { Card, Row, Col, Button } from 'react-bootstrap';
+import { Card, Row, Col, Button, Badge, ButtonGroup } from 'react-bootstrap';
 import { Category } from '../models';
 import { useData } from '../context/DataContext';
 import { usePermissions } from '../hooks/usePermissions';
 import CategoryModal from '../components/modals/CategoryModal';
 
 const CategoriesPage = () => {
-  const { categories } = useData();
+  const { categories, updateCategory } = useData();
   const { hasPermission } = usePermissions();
   const [showModal, setShowModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('create');
 
   const handleEdit = (category: Category) => {
     setSelectedCategory(category);
+    setModalMode('edit');
     setShowModal(true);
   };
 
   const handleAdd = () => {
     setSelectedCategory(null);
+    setModalMode('create');
     setShowModal(true);
+  };
+
+  const toggleActive = async (category: Category) => {
+    const updated = new Category(
+      category.id,
+      category.name,
+      category.description,
+      category.parentCategoryId,
+      !category.active
+    );
+    await updateCategory(updated);
   };
 
   return (
@@ -46,24 +60,31 @@ const CategoriesPage = () => {
                     <i className="bi bi-tag-fill text-primary me-2"></i>
                     {category.name}
                   </span>
-                  {hasPermission('canManageCategories') && (
+                  <ButtonGroup size="sm">
                     <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => handleEdit(category)}
+                      variant={category.active ? 'outline-success' : 'outline-secondary'}
+                      title={category.active ? 'Marcar como inactiva' : 'Marcar como activa'}
+                      onClick={() => toggleActive(category)}
+                      disabled={!hasPermission('canManageCategories')}
                     >
-                      <i className="bi bi-pencil"></i>
+                      <i className={category.active ? 'bi bi-toggle-on' : 'bi bi-toggle-off'}></i>
                     </Button>
-                  )}
+                    {hasPermission('canManageCategories') && (
+                      <Button
+                        variant="outline-primary"
+                        onClick={() => handleEdit(category)}
+                      >
+                        <i className="bi bi-pencil"></i>
+                      </Button>
+                    )}
+                  </ButtonGroup>
                 </Card.Title>
                 <Card.Text className="text-muted">
                   {category.description}
                 </Card.Text>
-                {category.active ? (
-                  <span className="badge bg-success">Activa</span>
-                ) : (
-                  <span className="badge bg-secondary">Inactiva</span>
-                )}
+                <Badge bg={category.active ? 'success' : 'secondary'}>
+                  {category.active ? 'Activa' : 'Inactiva'}
+                </Badge>
               </Card.Body>
             </Card>
           </Col>
@@ -84,6 +105,7 @@ const CategoriesPage = () => {
           show={showModal}
           onHide={() => setShowModal(false)}
           category={selectedCategory}
+          readOnly={modalMode === 'view'}
         />
       )}
     </>

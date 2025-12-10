@@ -1,23 +1,26 @@
 import { useState } from 'react';
-import { Card, Table, Button, Badge } from 'react-bootstrap';
+import { Card, Table, Button, Badge, ButtonGroup } from 'react-bootstrap';
 import { useData } from '../context/DataContext';
 import { usePermissions } from '../hooks/usePermissions';
 import { Author } from '../models';
 import AuthorModal from '../components/modals/AuthorModal';
 
 const AuthorsPage = () => {
-  const { authors } = useData();
+  const { authors, deleteAuthor } = useData();
   const { hasPermission } = usePermissions();
   const [showModal, setShowModal] = useState(false);
   const [selectedAuthor, setSelectedAuthor] = useState<Author | null>(null);
+  const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('create');
 
   const handleEdit = (author: Author) => {
     setSelectedAuthor(author);
+    setModalMode('edit');
     setShowModal(true);
   };
 
   const handleAdd = () => {
     setSelectedAuthor(null);
+    setModalMode('create');
     setShowModal(true);
   };
 
@@ -64,15 +67,34 @@ const AuthorsPage = () => {
                     <Badge bg="success">Activo</Badge>
                   </td>
                   <td>
-                    {hasPermission('canManageAuthors') && (
+                    <ButtonGroup size="sm">
                       <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={() => handleEdit(author)}
+                        variant="outline-info"
+                        onClick={() => { setSelectedAuthor(author); setModalMode('view'); setShowModal(true); }}
                       >
-                        <i className="bi bi-pencil"></i>
+                        <i className="bi bi-eye"></i>
                       </Button>
-                    )}
+                      {hasPermission('canManageAuthors') && (
+                        <>
+                          <Button
+                            variant="outline-primary"
+                            onClick={() => handleEdit(author)}
+                          >
+                            <i className="bi bi-pencil"></i>
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            onClick={() => {
+                              if (window.confirm('¿Eliminar este autor?')) {
+                                deleteAuthor(author.id);
+                              }
+                            }}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </Button>
+                        </>
+                      )}
+                    </ButtonGroup>
                   </td>
                 </tr>
               ))}
@@ -92,6 +114,7 @@ const AuthorsPage = () => {
           show={showModal}
           onHide={() => setShowModal(false)}
           author={selectedAuthor}
+          readOnly={modalMode === 'view'}
         />
       )}
     </>

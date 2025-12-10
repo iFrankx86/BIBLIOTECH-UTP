@@ -21,7 +21,7 @@ const ReservationModal = ({ show, onHide, reservation }: ReservationModalProps) 
 
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -40,26 +40,30 @@ const ReservationModal = ({ show, onHide, reservation }: ReservationModalProps) 
       reservation?.id || Date.now().toString(),
       formData.bookId,
       formData.memberId,
-      new Date(),
-      expirationDate,
-      'pending'
+      reservation ? new Date(reservation.reservationDate) : new Date(),
+      reservation ? new Date(reservation.expirationDate) : expirationDate,
+      reservation?.status || 'pending'
     );
+    newReservation.notified = reservation?.notified ?? false;
 
-    if (reservation) {
-      updateReservation(newReservation);
-    } else {
-      addReservation(newReservation);
+    try {
+      if (reservation) {
+        await updateReservation(newReservation);
+      } else {
+        await addReservation(newReservation);
+      }
+      onHide();
+      // Resetear formulario
+      setFormData({
+        memberId: user?.id || '',
+        bookId: '',
+      });
+    } catch (err) {
+      setError('No se pudo guardar la reserva. Verifique disponibilidad del libro.');
     }
-
-    onHide();
-    // Resetear formulario
-    setFormData({
-      memberId: user?.id || '',
-      bookId: '',
-    });
   };
 
-  const availableBooks = books.filter((book: Book) => book.availableCopies > 0);
+  const availableBooks = books.filter((book: Book) => book.availableCopies > 0 || book.id === reservation?.bookId);
 
   return (
     <Modal show={show} onHide={onHide} size="lg">

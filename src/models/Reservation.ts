@@ -5,7 +5,7 @@ export class Reservation {
   memberId: string;
   reservationDate: Date;
   expirationDate: Date;
-  status: 'pending' | 'ready' | 'completed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'expired';
   notified: boolean;
 
   constructor(
@@ -14,7 +14,7 @@ export class Reservation {
     memberId: string,
     reservationDate: Date,
     expirationDate: Date,
-    status: 'pending' | 'ready' | 'completed' | 'cancelled' = 'pending'
+    status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'expired' = 'pending'
   ) {
     this.id = id;
     this.bookId = bookId;

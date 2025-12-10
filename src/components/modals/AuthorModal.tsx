@@ -7,9 +7,10 @@ interface AuthorModalProps {
   show: boolean;
   onHide: () => void;
   author?: Author | null;
+  readOnly?: boolean;
 }
 
-const AuthorModal = ({ show, onHide, author }: AuthorModalProps) => {
+const AuthorModal = ({ show, onHide, author, readOnly = false }: AuthorModalProps) => {
   const { addAuthor, updateAuthor } = useData();
   
   const [formData, setFormData] = useState({
@@ -22,6 +23,10 @@ const AuthorModal = ({ show, onHide, author }: AuthorModalProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (readOnly) {
+      onHide();
+      return;
+    }
     
     const newAuthor = new Author(
       author?.id || Date.now().toString(),
@@ -59,6 +64,7 @@ const AuthorModal = ({ show, onHide, author }: AuthorModalProps) => {
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                   required
+                  disabled={readOnly}
                 />
               </Form.Group>
             </Col>
@@ -70,6 +76,7 @@ const AuthorModal = ({ show, onHide, author }: AuthorModalProps) => {
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                   required
+                  disabled={readOnly}
                 />
               </Form.Group>
             </Col>
@@ -84,6 +91,7 @@ const AuthorModal = ({ show, onHide, author }: AuthorModalProps) => {
                   value={formData.birthDate}
                   onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
                   required
+                  disabled={readOnly}
                 />
               </Form.Group>
             </Col>
@@ -95,6 +103,7 @@ const AuthorModal = ({ show, onHide, author }: AuthorModalProps) => {
                   value={formData.nationality}
                   onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
                   required
+                  disabled={readOnly}
                 />
               </Form.Group>
             </Col>
@@ -107,16 +116,19 @@ const AuthorModal = ({ show, onHide, author }: AuthorModalProps) => {
               rows={4}
               value={formData.biography}
               onChange={(e) => setFormData({ ...formData, biography: e.target.value })}
+              disabled={readOnly}
             />
           </Form.Group>
 
           <div className="d-flex justify-content-end gap-2">
             <Button variant="secondary" onClick={onHide}>
-              Cancelar
+              {readOnly ? 'Cerrar' : 'Cancelar'}
             </Button>
-            <Button variant="primary" type="submit">
-              {author ? 'Actualizar' : 'Guardar'}
-            </Button>
+            {!readOnly && (
+              <Button variant="primary" type="submit">
+                {author ? 'Actualizar' : 'Guardar'}
+              </Button>
+            )}
           </div>
         </Form>
       </Modal.Body>

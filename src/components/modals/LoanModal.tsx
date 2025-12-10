@@ -22,7 +22,7 @@ const LoanModal = ({ show, onHide, loan }: LoanModalProps) => {
 
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -47,7 +47,7 @@ const LoanModal = ({ show, onHide, loan }: LoanModalProps) => {
         loan.employeeId
       );
       updatedLoan.returnDate = loan.returnDate;
-      updateLoan(updatedLoan);
+      await updateLoan(updatedLoan);
     } else {
       // Create new loan
       const newLoan = new Loan(
@@ -58,12 +58,7 @@ const LoanModal = ({ show, onHide, loan }: LoanModalProps) => {
         dueDate,
         employees[0]?.id || user?.id || '1'
       );
-      addLoan(newLoan);
-      
-      // Actualizar copias disponibles
-      if (selectedBook) {
-        selectedBook.availableCopies--;
-      }
+      await addLoan(newLoan);
     }
 
     onHide();
@@ -91,7 +86,7 @@ const LoanModal = ({ show, onHide, loan }: LoanModalProps) => {
             >
               <option value="">Seleccionar libro</option>
               {books
-                .filter((book: Book) => book.availableCopies > 0)
+                .filter((book: Book) => book.availableCopies > 0 || book.id === loan?.bookId)
                 .map((book: Book) => (
                   <option key={book.id} value={book.id}>
                     {book.title} (Disponibles: {book.availableCopies})

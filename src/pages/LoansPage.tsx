@@ -1,9 +1,11 @@
-import { Card, Table, Badge } from 'react-bootstrap';
+import { Card, Table, Badge, Button } from 'react-bootstrap';
 import { useData } from '../context/DataContext';
+import { usePermissions } from '../hooks/usePermissions';
 import { Loan, Book, Member } from '../models';
 
 const LoansPage = () => {
-  const { loans, books, members } = useData();
+  const { loans, books, members, confirmReturn } = useData();
+  const { hasPermission } = usePermissions();
 
   const getBookTitle = (bookId: string) => {
     const book = books.find((b: Book) => b.id === bookId);
@@ -34,6 +36,7 @@ const LoansPage = () => {
                 <th>Fecha de Vencimiento</th>
                 <th>Fecha de Devolución</th>
                 <th>Estado</th>
+                {hasPermission('canManageLoans') && <th>Acciones</th>}
               </tr>
             </thead>
             <tbody>
@@ -54,6 +57,19 @@ const LoansPage = () => {
                        loan.status === 'returned' ? 'Devuelto' : 'Vencido'}
                     </Badge>
                   </td>
+                  {hasPermission('canManageLoans') && (
+                    <td>
+                      {loan.status !== 'returned' && (
+                        <Button
+                          size="sm"
+                          variant="outline-success"
+                          onClick={async () => { await confirmReturn(loan.id); }}
+                        >
+                          Confirmar devolución
+                        </Button>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { Card, Table, Button, Badge } from 'react-bootstrap';
+import { Card, Table, Button, Badge, ButtonGroup } from 'react-bootstrap';
 import { useData } from '../context/DataContext';
 import { usePermissions } from '../hooks/usePermissions';
 import { Book, Author, Publisher, Category } from '../models';
 import BookModal from '../components/modals/BookModal';
 
 const BooksPage = () => {
-  const { books, authors, publishers, categories } = useData();
+  const { books, authors, publishers, categories, deleteBook } = useData();
   const { hasPermission, role } = usePermissions();
   const [showModal, setShowModal] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('create');
 
   const getAuthorName = (authorId: string) => {
     const author = authors.find((a: Author) => a.id === authorId);
@@ -38,7 +39,7 @@ const BooksPage = () => {
           </p>
         </div>
         {hasPermission('canManageBooks') && (
-          <Button variant="primary" onClick={() => { setSelectedBook(null); setShowModal(true); }}>
+          <Button variant="primary" onClick={() => { setSelectedBook(null); setModalMode('create'); setShowModal(true); }}>
             <i className="bi bi-plus-circle me-2"></i>
             Nuevo Libro
           </Button>
@@ -79,24 +80,35 @@ const BooksPage = () => {
                     </Badge>
                   </td>
                   <td>
-                    {hasPermission('canManageBooks') ? (
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        className="me-2"
-                        onClick={() => { setSelectedBook(book); setShowModal(true); }}
-                      >
-                        <i className="bi bi-pencil"></i>
-                      </Button>
-                    ) : (
+                    <ButtonGroup size="sm">
                       <Button
                         variant="outline-info"
-                        size="sm"
                         title="Ver detalles"
+                        onClick={() => { setSelectedBook(book); setModalMode('view'); setShowModal(true); }}
                       >
                         <i className="bi bi-eye"></i>
                       </Button>
-                    )}
+                      {hasPermission('canManageBooks') && (
+                        <>
+                          <Button
+                            variant="outline-primary"
+                            onClick={() => { setSelectedBook(book); setModalMode('edit'); setShowModal(true); }}
+                          >
+                            <i className="bi bi-pencil"></i>
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            onClick={() => {
+                              if (window.confirm('¿Eliminar este libro? Esta acción no se puede deshacer.')) {
+                                deleteBook(book.id);
+                              }
+                            }}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </Button>
+                        </>
+                      )}
+                    </ButtonGroup>
                   </td>
                 </tr>
               ))}
@@ -115,6 +127,7 @@ const BooksPage = () => {
         show={showModal} 
         onHide={() => setShowModal(false)} 
         book={selectedBook}
+        readOnly={modalMode === 'view'}
       />
     </>
   );

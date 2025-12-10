@@ -38,6 +38,9 @@ interface DataContextType {
   addReservation: (reservation: Reservation) => Promise<void>;
   updateReservation: (reservation: Reservation) => Promise<void>;
   deleteReservation: (id: string) => Promise<void>;
+  confirmReservation: (id: string) => Promise<void>;
+  cancelReservation: (id: string) => Promise<void>;
+  completeReservation: (id: string) => Promise<void>;
   addFine: (fine: Fine) => Promise<void>;
   updateFine: (fine: Fine) => Promise<void>;
   deleteFine: (id: string) => Promise<void>;
@@ -50,6 +53,7 @@ interface DataContextType {
   addEmployee: (employee: Employee) => Promise<void>;
   updateEmployee: (employee: Employee) => Promise<void>;
   deleteEmployee: (id: string) => Promise<void>;
+  confirmReturn: (loanId: string, returnDate?: Date) => Promise<void>;
   refreshAll: () => Promise<void>;
 }
 
@@ -106,6 +110,19 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
     });
   };
 
+  const hydrateCategories = (data: Record<string, unknown>[]): Category[] => {
+    return data.map((item: Record<string, unknown>) => {
+      const category = new Category(
+        item.id as string,
+        item.name as string,
+        item.description as string,
+        item.parentCategoryId as string | undefined,
+        item.active !== undefined ? (item.active as boolean) : true
+      );
+      return category;
+    });
+  };
+
   const hydrateMembers = (data: Record<string, unknown>[]): Member[] => {
     return data.map((item: Record<string, unknown>) => {
       const member = new Member(
@@ -116,7 +133,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
         item.phone as string,
         item.address as string,
         item.membershipType as 'basic' | 'premium' | 'vip',
-        item.idNumber as string
+        item.idNumber as string,
+        item.active !== undefined ? (item.active as boolean) : true
       );
       member.membershipDate = new Date(item.membershipDate as string);
       return member;
@@ -142,6 +160,18 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
     });
   };
 
+  const findBook = (bookId: string): Book | undefined => books.find((b: Book) => b.id === bookId);
+
+  const adjustAvailableCopies = async (bookId: string, delta: number) => {
+    const book = findBook(bookId);
+    if (!book) return;
+    const nextAvailable = Math.max(0, Math.min(book.totalCopies, book.availableCopies + delta));
+    if (nextAvailable === book.availableCopies) return;
+    const updatedBook = { ...book, availableCopies: nextAvailable } as Book;
+    await booksAPI.update(updatedBook.id, updatedBook);
+    setBooks(books.map((b: Book) => (b.id === updatedBook.id ? updatedBook : b)));
+  };
+
   const fetchAllData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -165,7 +195,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
       setMembers(hydrateMembers(membersRes.data as unknown as Record<string, unknown>[]));
       setEmployees(hydrateEmployees(employeesRes.data as unknown as Record<string, unknown>[]));
       setLoans(loansRes.data);
-      setCategories(categoriesRes.data);
+      setCategories(hydrateCategories(categoriesRes.data as unknown as Record<string, unknown>[]));
       setPublishers(publishersRes.data);
       setReservations(reservationsRes.data);
       setFines(finesRes.data);
@@ -233,8 +263,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
     setLoans([...loans, response.data]);
     const book = books.find((b: Book) => b.id === loan.bookId);
     if (book && book.availableCopies > 0) {
-      const updatedBook = { ...book, availableCopies: book.availableCopies - 1 };
-      await updateBook(updatedBook);
+      await adjustAvailableCopies(book.id, -1);
     }
   };
 
@@ -242,11 +271,31 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
     const oldLoan = loans.find((l: Loan) => l.id === updatedLoan.id);
     await loansAPI.update(updatedLoan.id, updatedLoan);
     setLoans(loans.map((loan: Loan) => loan.id === updatedLoan.id ? updatedLoan : loan));
-    if (oldLoan && oldLoan.status !== 'returned' && updatedLoan.status === 'returned') {
-      const book = books.find((b: Book) => b.id === updatedLoan.bookId);
-      if (book) {
-        const updatedBook = { ...book, availableCopies: book.availableCopies + 1 };
-        await updateBook(updatedBook);
+    const becameReturned = oldLoan && oldLoan.status !== 'returned' && updatedLoan.status === 'returned';
+    if (becameReturned) {
+      await adjustAvailableCopies(updatedLoan.bookId, 1);
+
+      const effectiveReturnDate = updatedLoan.returnDate ? new Date(updatedLoan.returnDate) : new Date();
+      const dueDate = new Date(updatedLoan.dueDate);
+      const isLate = effectiveReturnDate > dueDate;
+
+      if (isLate) {
+        const daysLate = Math.max(1, Math.ceil((effectiveReturnDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)));
+        const amount = Number((daysLate * 2).toFixed(2));
+        const existingFine = fines.find((fine: Fine) => fine.loanId === updatedLoan.id && fine.status === 'pending');
+
+        if (!existingFine) {
+          const newFine = new Fine(
+            Date.now().toString(),
+            updatedLoan.id,
+            updatedLoan.memberId,
+            amount,
+            `Devolución tardía (${daysLate} día${daysLate > 1 ? 's' : ''})`,
+            effectiveReturnDate,
+            'pending'
+          );
+          await addFine(newFine);
+        }
       }
     }
   };
@@ -292,13 +341,76 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
   };
 
   const updateReservation = async (updatedReservation: Reservation) => {
+    const current = reservations.find((res: Reservation) => res.id === updatedReservation.id);
+    const prevStatus = current?.status;
+    const nextStatus = updatedReservation.status;
+
+    if (prevStatus !== 'confirmed' && nextStatus === 'confirmed') {
+      const book = findBook(updatedReservation.bookId);
+      if (!book || book.availableCopies <= 0) {
+        throw new Error('No hay copias disponibles para confirmar la reserva');
+      }
+      await adjustAvailableCopies(updatedReservation.bookId, -1);
+    }
+
+    if (prevStatus === 'confirmed' && nextStatus === 'cancelled') {
+      await adjustAvailableCopies(updatedReservation.bookId, 1);
+    }
+
     await reservationsAPI.update(updatedReservation.id, updatedReservation);
     setReservations(reservations.map((reservation: Reservation) => reservation.id === updatedReservation.id ? updatedReservation : reservation));
   };
 
   const deleteReservation = async (id: string) => {
+    const reservation = reservations.find((res: Reservation) => res.id === id);
+    if (reservation && reservation.status === 'confirmed') {
+      await adjustAvailableCopies(reservation.bookId, 1);
+    }
     await reservationsAPI.delete(id);
     setReservations(reservations.filter((reservation: Reservation) => reservation.id !== id));
+  };
+
+  const confirmReservation = async (id: string) => {
+    const reservation = reservations.find((res: Reservation) => res.id === id);
+    if (!reservation) return;
+    const updatedReservation = new Reservation(
+      reservation.id,
+      reservation.bookId,
+      reservation.memberId,
+      new Date(reservation.reservationDate),
+      new Date(reservation.expirationDate),
+      'confirmed'
+    );
+    updatedReservation.notified = true;
+    await updateReservation(updatedReservation);
+  };
+
+  const cancelReservation = async (id: string) => {
+    const reservation = reservations.find((res: Reservation) => res.id === id);
+    if (!reservation) return;
+    const updatedReservation = new Reservation(
+      reservation.id,
+      reservation.bookId,
+      reservation.memberId,
+      new Date(reservation.reservationDate),
+      new Date(reservation.expirationDate),
+      'cancelled'
+    );
+    await updateReservation(updatedReservation);
+  };
+
+  const completeReservation = async (id: string) => {
+    const reservation = reservations.find((res: Reservation) => res.id === id);
+    if (!reservation) return;
+    const updatedReservation = new Reservation(
+      reservation.id,
+      reservation.bookId,
+      reservation.memberId,
+      new Date(reservation.reservationDate),
+      new Date(reservation.expirationDate),
+      'completed'
+    );
+    await updateReservation(updatedReservation);
   };
 
   const addFine = async (fine: Fine) => {
@@ -361,6 +473,23 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
     setEmployees(employees.filter((employee: Employee) => employee.id !== id));
   };
 
+  const confirmReturn = async (loanId: string, returnDate: Date = new Date()) => {
+    const loan = loans.find((l: Loan) => l.id === loanId);
+    if (!loan) return;
+    const updatedLoan = new Loan(
+      loan.id,
+      loan.bookId,
+      loan.memberId,
+      new Date(loan.loanDate),
+      new Date(loan.dueDate),
+      loan.employeeId,
+      'returned'
+    );
+    updatedLoan.returnDate = returnDate;
+    if (loan.notes) updatedLoan.notes = loan.notes;
+    await updateLoan(updatedLoan);
+  };
+
   const refreshAll = async () => {
     await fetchAllData();
   };
@@ -402,6 +531,9 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
         addReservation,
         updateReservation,
         deleteReservation,
+        confirmReservation,
+        cancelReservation,
+        completeReservation,
         addFine,
         updateFine,
         deleteFine,
@@ -414,6 +546,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
         addEmployee,
         updateEmployee,
         deleteEmployee,
+        confirmReturn,
         refreshAll,
       }}
     >

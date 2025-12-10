@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Table, Button, Badge } from 'react-bootstrap';
+import { Card, Table, Button, Badge, Alert, ButtonGroup, Spinner } from 'react-bootstrap';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
@@ -7,11 +7,13 @@ import { Reservation, Book, Member } from '../models';
 import ReservationModal from '../components/modals/ReservationModal';
 
 const ReservationsPage = () => {
-  const { reservations, books, members } = useData();
+  const { reservations, books, members, confirmReservation, cancelReservation, completeReservation, deleteReservation } = useData();
   const { user } = useAuth();
   const { hasPermission, role } = usePermissions();
   const [showModal, setShowModal] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [error, setError] = useState('');
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   // Filtrar reservas según el rol
   const displayReservations = role === 'member'
@@ -38,9 +40,43 @@ const ReservationsPage = () => {
     setShowModal(true);
   };
 
+  const handleConfirm = async (id: string) => {
+    setProcessingId(id);
+    setError('');
+    try {
+      await confirmReservation(id);
+    } catch (err) {
+      setError('No hay copias disponibles para confirmar esta reserva.');
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleCancel = async (id: string) => {
+    setProcessingId(id);
+    setError('');
+    await cancelReservation(id);
+    setProcessingId(null);
+  };
+
+  const handleComplete = async (id: string) => {
+    setProcessingId(id);
+    setError('');
+    await completeReservation(id);
+    setProcessingId(null);
+  };
+
+  const handleDelete = async (id: string) => {
+    setProcessingId(id);
+    setError('');
+    await deleteReservation(id);
+    setProcessingId(null);
+  };
+
   const getStatusBadge = (status: string) => {
     const statusMap: { [key: string]: { bg: string; text: string } } = {
       pending: { bg: 'warning', text: 'Pendiente' },
+      confirmed: { bg: 'info', text: 'Confirmada' },
       completed: { bg: 'success', text: 'Completada' },
       cancelled: { bg: 'danger', text: 'Cancelada' },
       expired: { bg: 'secondary', text: 'Expirada' }
@@ -68,6 +104,11 @@ const ReservationsPage = () => {
 
       <Card>
         <Card.Body>
+          {error && (
+            <Alert variant="danger" onClose={() => setError('')} dismissible>
+              {error}
+            </Alert>
+          )}
           <Table responsive hover>
             <thead className="table-light">
               <tr>
@@ -78,6 +119,7 @@ const ReservationsPage = () => {
                 <th>Fecha de Expiración</th>
                 <th>Estado</th>
                 {hasPermission('canManageReservations') && <th>Acciones</th>}
+                {role === 'member' && <th>Acciones</th>}
               </tr>
             </thead>
             <tbody>
@@ -91,13 +133,68 @@ const ReservationsPage = () => {
                   <td>{getStatusBadge(reservation.status)}</td>
                   {hasPermission('canManageReservations') && (
                     <td>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={() => handleEdit(reservation)}
-                      >
-                        <i className="bi bi-pencil"></i>
-                      </Button>
+                      <ButtonGroup size="sm">
+                        {reservation.status === 'pending' && (
+                          <Button
+                            variant="outline-success"
+                            onClick={() => handleConfirm(reservation.id)}
+                            disabled={processingId === reservation.id}
+                          >
+                            {processingId === reservation.id ? <Spinner size="sm" animation="border" /> : 'Confirmar'}
+                          </Button>
+                        )}
+                        {reservation.status === 'confirmed' && (
+                          <Button
+                            variant="outline-primary"
+                            onClick={() => handleComplete(reservation.id)}
+                            disabled={processingId === reservation.id}
+                          >
+                            {processingId === reservation.id ? <Spinner size="sm" animation="border" /> : 'Completar'}
+                          </Button>
+                        )}
+                        {reservation.status !== 'completed' && (
+                          <Button
+                            variant="outline-danger"
+                            onClick={() => handleCancel(reservation.id)}
+                            disabled={processingId === reservation.id}
+                          >
+                            Cancelar
+                          </Button>
+                        )}
+                        {reservation.status !== 'completed' && (
+                          <Button
+                            variant="outline-secondary"
+                            onClick={() => {
+                              if (window.confirm('¿Eliminar esta reserva?')) {
+                                handleDelete(reservation.id);
+                              }
+                            }}
+                            disabled={processingId === reservation.id}
+                          >
+                            Eliminar
+                          </Button>
+                        )}
+                        <Button
+                          variant="outline-secondary"
+                          onClick={() => handleEdit(reservation)}
+                        >
+                          <i className="bi bi-pencil"></i>
+                        </Button>
+                      </ButtonGroup>
+                    </td>
+                  )}
+                  {role === 'member' && (
+                    <td>
+                      {reservation.status === 'pending' && (
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => handleCancel(reservation.id)}
+                          disabled={processingId === reservation.id}
+                        >
+                          {processingId === reservation.id ? 'Cancelando...' : 'Cancelar'}
+                        </Button>
+                      )}
                     </td>
                   )}
                 </tr>
