@@ -795,10 +795,22 @@
     {
       "id": "2",
       "bookId": "2",
-      "locationCode": "A-01-002",
+      "barcode": "23423423423",
+      "location": "Estante Z - Piso 3",
       "condition": "excellent",
       "acquisitionDate": "2024-02-15T00:00:00.000Z",
-      "lastInventoryCheck": "2025-11-01T00:00:00.000Z"
+      "acquisitionPrice": 10,
+      "status": "available"
+    },
+    {
+      "id": "1765356016891",
+      "bookId": "3",
+      "barcode": "12312313",
+      "location": "Estante R - Piso 4",
+      "condition": "fair",
+      "acquisitionDate": "2025-12-04T00:00:00.000Z",
+      "acquisitionPrice": 25,
+      "status": "maintenance"
     }
   ],
   "suppliers": [
