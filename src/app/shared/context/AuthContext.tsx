@@ -15,7 +15,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    // Cargar usuario desde localStorage al inicializar
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
   const [loading, setLoading] = useState<boolean>(false);
 
   const login = async (username: string, password: string): Promise<boolean> => {
@@ -133,11 +137,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
   };
 
   React.useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-
+    // Sincronizar entre pestañas cuando cambia localStorage
     const handleStorage = (event: StorageEvent) => {
       if (event.key === 'user') {
         const nextUser = event.newValue ? JSON.parse(event.newValue) : null;
