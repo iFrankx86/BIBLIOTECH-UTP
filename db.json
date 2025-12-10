@@ -752,14 +752,13 @@
     },
     {
       "id": "2",
-      "memberId": "2",
       "loanId": "2",
+      "memberId": "2",
       "amount": 5,
       "reason": "Libro dañado",
-      "issueDate": "2025-11-28T00:00:00.000Z",
-      "dueDate": "2025-12-28T00:00:00.000Z",
-      "paymentDate": null,
-      "status": "pending"
+      "issueDate": "2025-12-10T09:14:12.743Z",
+      "paymentDate": "2025-12-10T09:14:12.743Z",
+      "status": "paid"
     },
     {
       "id": "1765329933879",
