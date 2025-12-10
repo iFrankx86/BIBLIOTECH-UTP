@@ -247,7 +247,7 @@
       "categoryId": "1",
       "publicationYear": 1967,
       "totalCopies": 10,
-      "availableCopies": 5,
+      "availableCopies": 6,
       "description": "Novela del escritor colombiano Gabriel García Márquez",
       "language": "Español",
       "pages": 432
@@ -491,18 +491,6 @@
       "membershipType": "basic",
       "active": true,
       "idNumber": "12345677"
-    },
-    {
-      "id": "1765367444666",
-      "firstName": "khjkhkhkhh",
-      "lastName": "hjkhjkkk",
-      "email": "wer@gmail.com",
-      "phone": "123456666",
-      "address": "casita",
-      "membershipDate": "2025-12-10T11:50:44.666Z",
-      "membershipType": "basic",
-      "active": true,
-      "idNumber": "11223344"
     }
   ],
   "employees": [
@@ -656,9 +644,29 @@
       "memberId": "3",
       "loanDate": "2025-12-10T10:50:30.055Z",
       "dueDate": "2025-12-24T10:50:30.055Z",
-      "status": "active",
-      "employeeId": "2",
-      "reservationId": "1765363785391-1-0"
+      "returnDate": "2025-12-10T14:38:33.366Z",
+      "status": "returned",
+      "employeeId": "2"
+    },
+    {
+      "id": "1765375247657-1765365257292",
+      "bookId": "1765365257292",
+      "memberId": "1",
+      "loanDate": "2025-12-10T14:00:47.657Z",
+      "dueDate": "2025-12-24T14:00:47.657Z",
+      "returnDate": "2025-12-10T14:38:52.323Z",
+      "status": "returned",
+      "employeeId": "1"
+    },
+    {
+      "id": "1765377643500-1765347228530",
+      "bookId": "1765347228530",
+      "memberId": "2",
+      "loanDate": "2025-12-10T14:40:43.500Z",
+      "dueDate": "2025-12-24T14:40:43.500Z",
+      "returnDate": "2025-12-10T14:40:58.486Z",
+      "status": "returned",
+      "employeeId": "1"
     }
   ],
   "reservations": [
@@ -776,6 +784,26 @@
       "status": "completed",
       "notified": true,
       "groupCode": "RES-1765363785391"
+    },
+    {
+      "id": "1765375232840-1765365257292-0",
+      "bookId": "1765365257292",
+      "memberId": "1",
+      "reservationDate": "2025-12-10T14:00:32.840Z",
+      "expirationDate": "2025-12-17T14:00:32.840Z",
+      "status": "completed",
+      "notified": true,
+      "groupCode": "RES-1765375232840"
+    },
+    {
+      "id": "1765377635029-1765347228530-0",
+      "bookId": "1765347228530",
+      "memberId": "2",
+      "reservationDate": "2025-12-10T14:40:35.029Z",
+      "expirationDate": "2025-12-17T14:40:35.029Z",
+      "status": "completed",
+      "notified": true,
+      "groupCode": "RES-1765377635029"
     }
   ],
   "fines": [
@@ -801,12 +829,13 @@
     },
     {
       "id": "1765329933879",
-      "loanId": "1765173421328",
-      "memberId": "1765173398700",
+      "loanId": "1765173398700",
+      "memberId": "1765173421328",
       "amount": 2,
       "reason": "Devolución tardía (1 día)",
-      "issueDate": "2025-12-10T01:25:33.839Z",
-      "status": "pending"
+      "issueDate": "2025-12-10T14:41:16.687Z",
+      "paymentDate": "2025-12-10T14:41:16.687Z",
+      "status": "paid"
     },
     {
       "id": "1765332536551",
