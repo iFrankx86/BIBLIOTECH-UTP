@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Table, Badge, Button, ButtonGroup } from 'react-bootstrap';
+import { Card, Table, Badge, Button, ButtonGroup, Form, InputGroup } from 'react-bootstrap';
 import { useData } from '../../shared/context/DataContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 import { Member } from '../../shared/types';
@@ -11,6 +11,18 @@ const MembersPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('create');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filtrado de miembros
+  const filteredMembers = members.filter((member: Member) => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return member.fullName.toLowerCase().includes(search) ||
+           member.email.toLowerCase().includes(search) ||
+           member.phone.toLowerCase().includes(search) ||
+           member.idNumber.toLowerCase().includes(search) ||
+           member.membershipType.toLowerCase().includes(search);
+  });
 
   const formatDate = (dateValue: Date | string) => {
     const parsed = new Date(dateValue);
@@ -57,6 +69,30 @@ const MembersPage = () => {
 
       <Card>
         <Card.Body>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <i className="bi bi-search"></i>
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar por nombre, email, teléfono, ID o tipo de membresía..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                <i className="bi bi-x-circle"></i>
+              </Button>
+            )}
+          </InputGroup>
+
+          {filteredMembers.length === 0 && searchTerm && (
+            <div className="text-center text-muted my-4">
+              <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2">No se encontraron miembros que coincidan con "{searchTerm}"</p>
+            </div>
+          )}
+
           <Table responsive hover>
             <thead className="table-light">
               <tr>
@@ -71,7 +107,7 @@ const MembersPage = () => {
               </tr>
             </thead>
             <tbody>
-              {members.map((member: Member) => (
+              {filteredMembers.map((member: Member) => (
                 <tr key={member.id}>
                   <td><code>{member.idNumber}</code></td>
                   <td><strong>{member.fullName}</strong></td>

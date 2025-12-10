@@ -4,8 +4,15 @@
 
 Se ha implementado funcionalidad de búsqueda/filtrado en tiempo real para las siguientes secciones del sistema BIBLIOTECH:
 
-### Sección Libros (1 página)
-1. **Catálogo de Libros / Gestión de Libros** (`BooksPage.tsx`) - ✅ **NUEVO**
+### Sección Libros (5 páginas)
+1. **Catálogo de Libros / Gestión de Libros** (`BooksPage.tsx`)
+2. **Gestión de Autores** (`AuthorsPage.tsx`) - ✅ **NUEVO**
+3. **Gestión de Editoriales** (`PublishersPage.tsx`) - ✅ **NUEVO**
+4. **Categorías de Libros** (`CategoriesPage.tsx`) - ✅ **NUEVO**
+
+### Sección Miembros (2 páginas)
+1. **Gestión de Miembros** (`MembersPage.tsx`) - ✅ **NUEVO**
+2. **Gestión de Empleados** (`EmployeesPage.tsx`) - ✅ **NUEVO**
 
 ### Sección Operaciones (3 páginas)
 1. **Gestionar Préstamos** (`LoansPage.tsx`)
@@ -16,7 +23,7 @@ Se ha implementado funcionalidad de búsqueda/filtrado en tiempo real para las s
 1. **Inventario** (`InventoryPage.tsx`)
 2. **Proveedores** (`SuppliersPage.tsx`)
 
-**Total: 6 páginas con búsqueda implementada**
+**Total: 11 páginas con búsqueda implementada** 🎉
 
 ## Características Implementadas
 
@@ -52,6 +59,50 @@ Se ha implementado funcionalidad de búsqueda/filtrado en tiempo real para las s
 - **Administrador**: Vista de "Gestión de Libros" con todas las funcionalidades
 - **Bibliotecario**: Vista de "Gestión de Libros" con todas las funcionalidades
 - **Miembro**: Vista de "Catálogo de Libros" (solo lectura + modo reserva)
+
+### Autores (`AuthorsPage.tsx`)
+**Busca en:**
+- Nombre completo del autor
+- Nacionalidad
+- Biografía
+
+**Placeholder**: "Buscar por nombre, nacionalidad o biografía..."
+
+### Editoriales (`PublishersPage.tsx`)
+**Busca en:**
+- Nombre de la editorial
+- País
+- Email
+- Sitio web
+
+**Placeholder**: "Buscar por nombre, país, email o sitio web..."
+
+### Categorías (`CategoriesPage.tsx`)
+**Busca en:**
+- Nombre de la categoría
+- Descripción
+
+**Placeholder**: "Buscar por nombre o descripción..."
+
+### Miembros (`MembersPage.tsx`)
+**Busca en:**
+- Nombre completo
+- Email
+- Teléfono
+- Número de identificación
+- Tipo de membresía
+
+**Placeholder**: "Buscar por nombre, email, teléfono, ID o tipo de membresía..."
+
+### Empleados (`EmployeesPage.tsx`)
+**Busca en:**
+- Nombre completo
+- Email
+- Teléfono
+- Cargo
+- Departamento
+
+**Placeholder**: "Buscar por nombre, email, teléfono, cargo o departamento..."
 
 ### Préstamos (`LoansPage.tsx`)
 **Busca en:**
@@ -136,12 +187,17 @@ const filteredX = X.filter((item) => {
 
 ## Archivos Modificados
 
-1. `/workspaces/BIBLIOTECH-UTP/src/app/features/books/BooksPage.tsx` - ✅ **NUEVO**
-2. `/workspaces/BIBLIOTECH-UTP/src/app/features/loans/LoansPage.tsx`
-3. `/workspaces/BIBLIOTECH-UTP/src/app/features/reservations/ReservationsPage.tsx`
-4. `/workspaces/BIBLIOTECH-UTP/src/app/features/fines/FinesPage.tsx`
-5. `/workspaces/BIBLIOTECH-UTP/src/app/features/inventory/InventoryPage.tsx`
-6. `/workspaces/BIBLIOTECH-UTP/src/app/features/suppliers/SuppliersPage.tsx`
+1. `/workspaces/BIBLIOTECH-UTP/src/app/features/books/BooksPage.tsx`
+2. `/workspaces/BIBLIOTECH-UTP/src/app/features/authors/AuthorsPage.tsx` - ✅ **NUEVO**
+3. `/workspaces/BIBLIOTECH-UTP/src/app/features/publishers/PublishersPage.tsx` - ✅ **NUEVO**
+4. `/workspaces/BIBLIOTECH-UTP/src/app/features/categories/CategoriesPage.tsx` - ✅ **NUEVO**
+5. `/workspaces/BIBLIOTECH-UTP/src/app/features/members/MembersPage.tsx` - ✅ **NUEVO**
+6. `/workspaces/BIBLIOTECH-UTP/src/app/features/employees/EmployeesPage.tsx` - ✅ **NUEVO**
+7. `/workspaces/BIBLIOTECH-UTP/src/app/features/loans/LoansPage.tsx`
+8. `/workspaces/BIBLIOTECH-UTP/src/app/features/reservations/ReservationsPage.tsx`
+9. `/workspaces/BIBLIOTECH-UTP/src/app/features/fines/FinesPage.tsx`
+10. `/workspaces/BIBLIOTECH-UTP/src/app/features/inventory/InventoryPage.tsx`
+11. `/workspaces/BIBLIOTECH-UTP/src/app/features/suppliers/SuppliersPage.tsx`
 
 ## Dependencias
 
@@ -162,12 +218,22 @@ const filteredX = X.filter((item) => {
    - Escribir el título del libro en el campo de búsqueda
    - Los resultados se filtran automáticamente
 
-3. **Buscar multas de un miembro**:
+3. **Buscar autores por nacionalidad**:
+   - Navegar a "Libros" → "Autores"
+   - Escribir la nacionalidad (ej: "Colombia")
+   - Ver todos los autores de ese país
+
+4. **Buscar miembros por tipo de membresía**:
+   - Navegar a "Miembros" → "Gestionar Miembros"
+   - Escribir el tipo (ej: "Premium")
+   - Ver todos los miembros con esa membresía
+
+5. **Buscar multas de un miembro**:
    - Navegar a "Operaciones" → "Gestionar Multas"
    - Escribir el nombre del miembro
    - Ver solo las multas de ese miembro
 
-4. **Buscar inventario por ubicación**:
+6. **Buscar inventario por ubicación**:
    - Navegar a "Gestión" → "Inventario"
    - Escribir la ubicación (ej: "A-01")
    - Ver todos los items en esa ubicación

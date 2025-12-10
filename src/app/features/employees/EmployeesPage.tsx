@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Table, Button, Badge } from 'react-bootstrap';
+import { Card, Table, Button, Badge, Form, InputGroup } from 'react-bootstrap';
 import { useData } from '../../shared/context/DataContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 import { Employee } from '../../shared/types';
@@ -10,6 +10,18 @@ const EmployeesPage = () => {
   const { hasPermission } = usePermissions();
   const [showModal, setShowModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filtrado de empleados
+  const filteredEmployees = employees.filter((employee: Employee) => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return employee.fullName.toLowerCase().includes(search) ||
+           employee.email.toLowerCase().includes(search) ||
+           employee.phone.toLowerCase().includes(search) ||
+           employee.position.toLowerCase().includes(search) ||
+           employee.department.toLowerCase().includes(search);
+  });
 
   const handleToggleActive = async (employee: Employee) => {
     const updated = new Employee(
@@ -62,6 +74,30 @@ const EmployeesPage = () => {
 
       <Card>
         <Card.Body>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <i className="bi bi-search"></i>
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar por nombre, email, teléfono, cargo o departamento..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                <i className="bi bi-x-circle"></i>
+              </Button>
+            )}
+          </InputGroup>
+
+          {filteredEmployees.length === 0 && searchTerm && (
+            <div className="text-center text-muted my-4">
+              <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2">No se encontraron empleados que coincidan con "{searchTerm}"</p>
+            </div>
+          )}
+
           <Table responsive hover>
             <thead className="table-light">
               <tr>
@@ -75,7 +111,7 @@ const EmployeesPage = () => {
               </tr>
             </thead>
             <tbody>
-              {employees.map((employee: Employee) => (
+              {filteredEmployees.map((employee: Employee) => (
                 <tr key={employee.id}>
                   <td><strong>{employee.fullName}</strong></td>
                   <td>{employee.email}</td>

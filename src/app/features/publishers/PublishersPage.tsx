@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Table, Button, Badge } from 'react-bootstrap';
+import { Card, Table, Button, Badge, Form, InputGroup } from 'react-bootstrap';
 import { useData } from '../../shared/context/DataContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 import { Publisher } from '../../shared/types';
@@ -10,6 +10,17 @@ const PublishersPage = () => {
   const { hasPermission } = usePermissions();
   const [showModal, setShowModal] = useState(false);
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filtrado de editoriales
+  const filteredPublishers = publishers.filter((publisher: Publisher) => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return publisher.name.toLowerCase().includes(search) ||
+           publisher.country.toLowerCase().includes(search) ||
+           publisher.email.toLowerCase().includes(search) ||
+           (publisher.website && publisher.website.toLowerCase().includes(search));
+  });
 
   const handleEdit = (publisher: Publisher) => {
     setSelectedPublisher(publisher);
@@ -60,6 +71,30 @@ const PublishersPage = () => {
 
       <Card>
         <Card.Body>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <i className="bi bi-search"></i>
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar por nombre, país, email o sitio web..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                <i className="bi bi-x-circle"></i>
+              </Button>
+            )}
+          </InputGroup>
+
+          {filteredPublishers.length === 0 && searchTerm && (
+            <div className="text-center text-muted my-4">
+              <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2">No se encontraron editoriales que coincidan con "{searchTerm}"</p>
+            </div>
+          )}
+
           <Table responsive hover>
             <thead className="table-light">
               <tr>
@@ -73,7 +108,7 @@ const PublishersPage = () => {
               </tr>
             </thead>
             <tbody>
-              {publishers.map((publisher: Publisher) => (
+              {filteredPublishers.map((publisher: Publisher) => (
                 <tr key={publisher.id}>
                   <td><strong>{publisher.name}</strong></td>
                   <td>{publisher.country}</td>

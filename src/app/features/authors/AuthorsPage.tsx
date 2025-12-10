@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Table, Button, Badge, ButtonGroup } from 'react-bootstrap';
+import { Card, Table, Button, Badge, ButtonGroup, Form, InputGroup } from 'react-bootstrap';
 import { useData } from '../../shared/context/DataContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 import { Author } from '../../shared/types';
@@ -11,6 +11,16 @@ const AuthorsPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedAuthor, setSelectedAuthor] = useState<Author | null>(null);
   const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('create');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filtrado de autores
+  const filteredAuthors = authors.filter((author: Author) => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return author.fullName.toLowerCase().includes(search) ||
+           author.nationality.toLowerCase().includes(search) ||
+           (author.biography && author.biography.toLowerCase().includes(search));
+  });
 
   const handleEdit = (author: Author) => {
     setSelectedAuthor(author);
@@ -41,6 +51,30 @@ const AuthorsPage = () => {
 
       <Card>
         <Card.Body>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <i className="bi bi-search"></i>
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar por nombre, nacionalidad o biografía..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                <i className="bi bi-x-circle"></i>
+              </Button>
+            )}
+          </InputGroup>
+
+          {filteredAuthors.length === 0 && searchTerm && (
+            <div className="text-center text-muted my-4">
+              <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2">No se encontraron autores que coincidan con "{searchTerm}"</p>
+            </div>
+          )}
+
           <Table responsive hover>
             <thead className="table-light">
               <tr>
@@ -53,7 +87,7 @@ const AuthorsPage = () => {
               </tr>
             </thead>
             <tbody>
-              {authors.map((author: Author) => (
+              {filteredAuthors.map((author: Author) => (
                 <tr key={author.id}>
                   <td><strong>{author.fullName}</strong></td>
                   <td>{author.nationality}</td>

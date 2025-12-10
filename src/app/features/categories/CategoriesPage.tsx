@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Row, Col, Button, Badge, ButtonGroup } from 'react-bootstrap';
+import { Card, Row, Col, Button, Badge, ButtonGroup, Form, InputGroup } from 'react-bootstrap';
 import { Category } from '../../shared/types';
 import { useData } from '../../shared/context/DataContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
@@ -11,6 +11,15 @@ const CategoriesPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('create');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filtrado de categorías
+  const filteredCategories = categories.filter((category: Category) => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return category.name.toLowerCase().includes(search) ||
+           (category.description && category.description.toLowerCase().includes(search));
+  });
 
   const handleEdit = (category: Category) => {
     setSelectedCategory(category);
@@ -56,8 +65,32 @@ const CategoriesPage = () => {
         )}
       </div>
 
+      <InputGroup className="mb-4">
+        <InputGroup.Text>
+          <i className="bi bi-search"></i>
+        </InputGroup.Text>
+        <Form.Control
+          type="text"
+          placeholder="Buscar por nombre o descripción..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {searchTerm && (
+          <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+            <i className="bi bi-x-circle"></i>
+          </Button>
+        )}
+      </InputGroup>
+
+      {filteredCategories.length === 0 && searchTerm && (
+        <div className="text-center text-muted my-4">
+          <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
+          <p className="mt-2">No se encontraron categorías que coincidan con "{searchTerm}"</p>
+        </div>
+      )}
+
       <Row>
-        {categories.map((category: Category) => (
+        {filteredCategories.map((category: Category) => (
           <Col md={6} lg={4} key={category.id} className="mb-4">
             <Card className="h-100">
               <Card.Body>
