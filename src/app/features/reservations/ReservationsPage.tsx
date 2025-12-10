@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Table, Button, Badge, Alert, ButtonGroup, Spinner, Modal, ListGroup } from 'react-bootstrap';
+import { Card, Table, Button, Badge, Alert, ButtonGroup, Spinner, Modal, ListGroup, Form, InputGroup } from 'react-bootstrap';
 import { useData } from '../../shared/context/DataContext';
 import { useAuth } from '../../shared/context/AuthContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
@@ -17,6 +17,7 @@ const ReservationsPage = () => {
   const [detailReservation, setDetailReservation] = useState<Reservation | null>(null);
   const [error, setError] = useState('');
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Filtrar reservas según el rol
   const displayReservations = role === 'member'
@@ -80,6 +81,15 @@ const ReservationsPage = () => {
     setProcessingId(null);
   };
 
+  // Filtrar reservas por término de búsqueda
+  const filteredReservations = displayReservations.filter((reservation: Reservation) => {
+    if (!searchTerm) return true;
+    const bookTitle = getBookTitle(reservation.bookId).toLowerCase();
+    const memberName = getMemberName(reservation.memberId).toLowerCase();
+    const term = searchTerm.toLowerCase();
+    return bookTitle.includes(term) || memberName.includes(term);
+  },);
+
   const getStatusBadge = (status: string) => {
     const statusMap: { [key: string]: { bg: string; text: string } } = {
       pending: { bg: 'warning', text: 'Pendiente' },
@@ -124,6 +134,31 @@ const ReservationsPage = () => {
               {error}
             </Alert>
           )}
+
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <i className="bi bi-search"></i>
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar por libro o miembro..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                <i className="bi bi-x-circle"></i>
+              </Button>
+            )}
+          </InputGroup>
+
+          {filteredReservations.length === 0 && searchTerm && (
+            <div className="text-center text-muted my-4">
+              <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2">No se encontraron reservas que coincidan con "{searchTerm}"</p>
+            </div>
+          )}
+
           <Table responsive hover>
             <thead className="table-light">
               <tr>
@@ -137,7 +172,7 @@ const ReservationsPage = () => {
               </tr>
             </thead>
             <tbody>
-              {displayReservations.map((reservation: Reservation) => (
+              {filteredReservations.map((reservation: Reservation) => (
                 <tr key={reservation.id}>
                   <td><code>#{reservation.groupCode || reservation.id}</code></td>
                   <td>{getBookTitle(reservation.bookId)}</td>

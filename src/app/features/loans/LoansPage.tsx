@@ -1,4 +1,4 @@
-import { Card, Table, Badge, Button, Modal, ListGroup } from 'react-bootstrap';
+import { Card, Table, Badge, Button, Modal, ListGroup, Form, InputGroup } from 'react-bootstrap';
 import { useState } from 'react';
 import { useData } from '../../shared/context/DataContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
@@ -12,6 +12,7 @@ const LoansPage = () => {
   const [detailLoan, setDetailLoan] = useState<Loan | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleAdd = () => {
     setSelectedLoan(null);
@@ -47,6 +48,15 @@ const LoansPage = () => {
     return { label: 'No devuelto', variant: 'warning' };
   };
 
+  // Filtrar préstamos por término de búsqueda
+  const filteredLoans = loans.filter((loan: Loan) => {
+    if (!searchTerm) return true;
+    const bookTitle = getBookTitle(loan.bookId).toLowerCase();
+    const memberName = getMemberName(loan.memberId).toLowerCase();
+    const term = searchTerm.toLowerCase();
+    return bookTitle.includes(term) || memberName.includes(term);
+  });
+
   return (
     <>
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -64,6 +74,30 @@ const LoansPage = () => {
 
       <Card>
         <Card.Body>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <i className="bi bi-search"></i>
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar por libro o miembro..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                <i className="bi bi-x-circle"></i>
+              </Button>
+            )}
+          </InputGroup>
+
+          {filteredLoans.length === 0 && searchTerm && (
+            <div className="text-center text-muted my-4">
+              <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2">No se encontraron préstamos que coincidan con "{searchTerm}"</p>
+            </div>
+          )}
+
           <Table responsive hover>
             <thead className="table-light">
               <tr>
@@ -78,7 +112,7 @@ const LoansPage = () => {
               </tr>
             </thead>
             <tbody>
-              {loans.map((loan: Loan) => (
+              {filteredLoans.map((loan: Loan) => (
                 <tr key={loan.id}>
                   <td><code>#{loan.id}</code></td>
                   <td>{getBookTitle(loan.bookId)}</td>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Table, Button, Badge } from 'react-bootstrap';
+import { Card, Table, Button, Badge, Form, InputGroup } from 'react-bootstrap';
 import { useData } from '../../shared/context/DataContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 import { Supplier } from '../../shared/types';
@@ -10,6 +10,7 @@ const SuppliersPage = () => {
   const { hasPermission } = usePermissions();
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleEdit = (supplier: Supplier) => {
     setSelectedSupplier(supplier);
@@ -43,6 +44,16 @@ const SuppliersPage = () => {
     await deleteSupplier(supplier.id);
   };
 
+  // Filtrar proveedores por término de búsqueda
+  const filteredSuppliers = suppliers.filter((supplier: Supplier) => {
+    if (!searchTerm) return true;
+    const name = supplier.name.toLowerCase();
+    const contactPerson = supplier.contactPerson.toLowerCase();
+    const email = supplier.email.toLowerCase();
+    const term = searchTerm.toLowerCase();
+    return name.includes(term) || contactPerson.includes(term) || email.includes(term);
+  });
+
   return (
     <>
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -60,6 +71,30 @@ const SuppliersPage = () => {
 
       <Card>
         <Card.Body>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <i className="bi bi-search"></i>
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar por nombre, contacto o email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                <i className="bi bi-x-circle"></i>
+              </Button>
+            )}
+          </InputGroup>
+
+          {filteredSuppliers.length === 0 && searchTerm && (
+            <div className="text-center text-muted my-4">
+              <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2">No se encontraron proveedores que coincidan con "{searchTerm}"</p>
+            </div>
+          )}
+
           <Table responsive hover>
             <thead className="table-light">
               <tr>
@@ -73,7 +108,7 @@ const SuppliersPage = () => {
               </tr>
             </thead>
             <tbody>
-              {suppliers.map((supplier: Supplier) => (
+              {filteredSuppliers.map((supplier: Supplier) => (
                 <tr key={supplier.id}>
                   <td><strong>{supplier.name}</strong></td>
                   <td>{supplier.contactPerson}</td>

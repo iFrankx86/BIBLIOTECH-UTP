@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Table, Button, Badge } from 'react-bootstrap';
+import { Card, Table, Button, Badge, Form, InputGroup } from 'react-bootstrap';
 import { useData } from '../../shared/context/DataContext';
 import { useAuth } from '../../shared/context/AuthContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
@@ -12,6 +12,7 @@ const FinesPage = () => {
   const { hasPermission, role } = usePermissions();
   const [showModal, setShowModal] = useState(false);
   const [selectedFine, setSelectedFine] = useState<Fine | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Filtrar multas según el rol
   const displayFines = role === 'member'
@@ -36,6 +37,15 @@ const FinesPage = () => {
   const totalPending = displayFines
     .filter((fine: Fine) => fine.status === 'pending')
     .reduce((sum: number, fine: Fine) => sum + fine.amount, 0);
+
+  // Filtrar multas por término de búsqueda
+  const filteredFines = displayFines.filter((fine: Fine) => {
+    if (!searchTerm) return true;
+    const memberName = getMemberName(fine.memberId).toLowerCase();
+    const reason = fine.reason.toLowerCase();
+    const term = searchTerm.toLowerCase();
+    return memberName.includes(term) || reason.includes(term);
+  });
 
   return (
     <>
@@ -64,6 +74,30 @@ const FinesPage = () => {
 
       <Card>
         <Card.Body>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <i className="bi bi-search"></i>
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar por miembro o motivo..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                <i className="bi bi-x-circle"></i>
+              </Button>
+            )}
+          </InputGroup>
+
+          {filteredFines.length === 0 && searchTerm && (
+            <div className="text-center text-muted my-4">
+              <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2">No se encontraron multas que coincidan con "{searchTerm}"</p>
+            </div>
+          )}
+
           <Table responsive hover>
             <thead className="table-light">
               <tr>
@@ -78,7 +112,7 @@ const FinesPage = () => {
               </tr>
             </thead>
             <tbody>
-              {displayFines.map((fine: Fine) => (
+              {filteredFines.map((fine: Fine) => (
                 <tr key={fine.id}>
                   <td><code>#{fine.id}</code></td>
                   {role !== 'member' && <td>{getMemberName(fine.memberId)}</td>}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Table, Button, Badge, Dropdown, ButtonGroup } from 'react-bootstrap';
+import { Card, Table, Button, Badge, Dropdown, ButtonGroup, Form, InputGroup } from 'react-bootstrap';
 import { useData } from '../../shared/context/DataContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 import { Inventory } from '../../shared/types';
@@ -10,6 +10,7 @@ const InventoryPage = () => {
   const { hasPermission } = usePermissions();
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Inventory | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleEdit = (item: Inventory) => {
     setSelectedItem(item);
@@ -46,6 +47,16 @@ const InventoryPage = () => {
     sum + (item.acquisitionPrice || 0), 0
   );
 
+  // Filtrar inventario por término de búsqueda
+  const filteredInventory = inventory.filter((item: Inventory) => {
+    if (!searchTerm) return true;
+    const barcode = item.barcode.toLowerCase();
+    const bookId = item.bookId.toLowerCase();
+    const location = item.location.toLowerCase();
+    const term = searchTerm.toLowerCase();
+    return barcode.includes(term) || bookId.includes(term) || location.includes(term);
+  });
+
   return (
     <>
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -69,6 +80,30 @@ const InventoryPage = () => {
 
       <Card>
         <Card.Body>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <i className="bi bi-search"></i>
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar por código de barras, libro ID o ubicación..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                <i className="bi bi-x-circle"></i>
+              </Button>
+            )}
+          </InputGroup>
+
+          {filteredInventory.length === 0 && searchTerm && (
+            <div className="text-center text-muted my-4">
+              <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2">No se encontraron items que coincidan con "{searchTerm}"</p>
+            </div>
+          )}
+
           <Table responsive hover>
             <thead className="table-light">
               <tr>
@@ -83,7 +118,7 @@ const InventoryPage = () => {
               </tr>
             </thead>
             <tbody>
-              {inventory.map((item: Inventory) => (
+              {filteredInventory.map((item: Inventory) => (
                 <tr key={item.id}>
                   <td><code>{item.barcode}</code></td>
                   <td><code>{item.bookId}</code></td>

@@ -167,7 +167,7 @@
       "categoryId": "1",
       "publicationYear": 1967,
       "totalCopies": 10,
-      "availableCopies": 6,
+      "availableCopies": 5,
       "description": "Novela del escritor colombiano Gabriel García Márquez",
       "language": "Español",
       "pages": 432
@@ -223,7 +223,7 @@
       "categoryId": "2",
       "publicationYear": 2025,
       "totalCopies": 12,
-      "availableCopies": 11,
+      "availableCopies": 10,
       "description": "",
       "language": "Español",
       "pages": 121
@@ -403,13 +403,13 @@
       "firstName": "Bibliotecario",
       "lastName": "Principal",
       "email": "librarian@bibliotech.com",
-      "phone": "",
+      "phone": "978678234",
       "position": "Bibliotecario",
       "department": "circulation",
-      "hireDate": "2025-12-10T05:25:42.440Z",
+      "hireDate": "2025-12-10T00:00:00.000Z",
       "salary": 0,
       "active": true,
-      "userId": "2"
+      "idNumber": "43567898"
     }
   ],
   "loans": [
@@ -469,6 +469,26 @@
       "returnDate": "2025-12-10T06:20:28.426Z",
       "status": "returned",
       "employeeId": "1"
+    },
+    {
+      "id": "1765363767803-1765173460907",
+      "bookId": "1765173460907",
+      "memberId": "3",
+      "loanDate": "2025-12-10T10:49:27.803Z",
+      "dueDate": "2025-12-24T10:49:27.803Z",
+      "status": "active",
+      "employeeId": "2",
+      "reservationId": "1765363736890-1765173460907-0"
+    },
+    {
+      "id": "1765363830055-1",
+      "bookId": "1",
+      "memberId": "3",
+      "loanDate": "2025-12-10T10:50:30.055Z",
+      "dueDate": "2025-12-24T10:50:30.055Z",
+      "status": "active",
+      "employeeId": "2",
+      "reservationId": "1765363785391-1-0"
     }
   ],
   "reservations": [
@@ -479,87 +499,6 @@
       "reservationDate": "2025-12-01T00:00:00.000Z",
       "expirationDate": "2025-12-08T00:00:00.000Z",
       "status": "completed",
-      "notified": false
-    },
-    {
-      "id": "2",
-      "bookId": "1",
-      "memberId": "3",
-      "reservationDate": "2025-12-05T00:00:00.000Z",
-      "expirationDate": "2025-12-12T00:00:00.000Z",
-      "status": "cancelled",
-      "notified": false
-    },
-    {
-      "id": "1765172635622",
-      "bookId": "1",
-      "memberId": "3",
-      "reservationDate": "2025-12-08T05:43:55.622Z",
-      "expirationDate": "2025-12-15T05:43:55.622Z",
-      "status": "cancelled",
-      "notified": false
-    },
-    {
-      "id": "1765172655729",
-      "bookId": "2",
-      "memberId": "3",
-      "reservationDate": "2025-12-08T05:44:15.729Z",
-      "expirationDate": "2025-12-15T05:44:15.729Z",
-      "status": "cancelled",
-      "notified": false
-    },
-    {
-      "id": "1765174515043",
-      "bookId": "4",
-      "memberId": "3",
-      "reservationDate": "2025-12-08T06:15:15.043Z",
-      "expirationDate": "2025-12-15T06:15:15.043Z",
-      "status": "cancelled",
-      "notified": false
-    },
-    {
-      "id": "1765174524102",
-      "bookId": "4",
-      "memberId": "3",
-      "reservationDate": "2025-12-08T06:15:24.102Z",
-      "expirationDate": "2025-12-15T06:15:24.102Z",
-      "status": "cancelled",
-      "notified": false
-    },
-    {
-      "id": "1765174529826",
-      "bookId": "4",
-      "memberId": "3",
-      "reservationDate": "2025-12-08T06:15:29.826Z",
-      "expirationDate": "2025-12-15T06:15:29.826Z",
-      "status": "cancelled",
-      "notified": false
-    },
-    {
-      "id": "1765324311587",
-      "bookId": "1765324300000",
-      "memberId": "3",
-      "reservationDate": "2025-12-09T23:51:51.587Z",
-      "expirationDate": "2025-12-16T23:51:51.587Z",
-      "status": "cancelled",
-      "notified": false
-    },
-    {
-      "id": "1765324321411",
-      "bookId": "1765324300000",
-      "memberId": "3",
-      "reservationDate": "2025-12-09T23:53:39.397Z",
-      "expirationDate": "2025-12-16T23:53:39.397Z",
-      "status": "cancelled",
-      "notified": false
-    },
-    {
-      "id": "1765324362494",
-      "bookId": "1",
-      "memberId": "3",
-      "reservationDate": "2025-12-09T23:52:42.494Z",
-      "expirationDate": "2025-12-16T23:52:42.494Z",
-      "status": "cancelled",
       "notified": false
     },
     {
@@ -597,96 +536,6 @@
       "expirationDate": "2025-12-17T03:49:14.141Z",
       "status": "completed",
       "notified": false
-    },
-    {
-      "id": "1765343620478-1765173460907-0",
-      "bookId": "1765173460907",
-      "memberId": "3",
-      "reservationDate": "2025-12-10T05:13:40.478Z",
-      "expirationDate": "2025-12-17T05:13:40.448Z",
-      "status": "cancelled",
-      "notified": false,
-      "groupCode": "RES-1765343620448"
-    },
-    {
-      "id": "1765343620482-1765331913123-0",
-      "bookId": "1765331913123",
-      "memberId": "3",
-      "reservationDate": "2025-12-10T05:13:40.482Z",
-      "expirationDate": "2025-12-17T05:13:40.448Z",
-      "status": "cancelled",
-      "notified": false,
-      "groupCode": "RES-1765343620448"
-    },
-    {
-      "id": "1765343807471-1765324200150-0",
-      "bookId": "1765324200150",
-      "memberId": "3",
-      "reservationDate": "2025-12-10T05:16:47.471Z",
-      "expirationDate": "2025-12-17T05:16:47.471Z",
-      "status": "cancelled",
-      "notified": false,
-      "groupCode": "RES-1765343807471"
-    },
-    {
-      "id": "1765343807494-1765331913123-0",
-      "bookId": "1765331913123",
-      "memberId": "3",
-      "reservationDate": "2025-12-10T05:16:47.494Z",
-      "expirationDate": "2025-12-17T05:16:47.471Z",
-      "status": "cancelled",
-      "notified": false,
-      "groupCode": "RES-1765343807471"
-    },
-    {
-      "id": "1765343984005-3-0",
-      "bookId": "3",
-      "memberId": "3",
-      "reservationDate": "2025-12-10T05:19:44.005Z",
-      "expirationDate": "2025-12-17T05:19:44.005Z",
-      "status": "cancelled",
-      "notified": false,
-      "groupCode": "RES-1765343984005"
-    },
-    {
-      "id": "1765343984032-1765173460907-0",
-      "bookId": "1765173460907",
-      "memberId": "3",
-      "reservationDate": "2025-12-10T05:19:44.032Z",
-      "expirationDate": "2025-12-17T05:19:44.005Z",
-      "status": "cancelled",
-      "notified": false,
-      "groupCode": "RES-1765343984005"
-    },
-    {
-      "id": "1765343984037-1765331913123-0",
-      "bookId": "1765331913123",
-      "memberId": "3",
-      "reservationDate": "2025-12-10T05:19:44.037Z",
-      "expirationDate": "2025-12-17T05:19:44.005Z",
-      "status": "cancelled",
-      "notified": false,
-      "groupCode": "RES-1765343984005"
-    },
-    {
-      "id": "1765344014678-1-0",
-      "bookId": "1",
-      "memberId": "3",
-      "reservationDate": "2025-12-10T05:20:14.678Z",
-      "expirationDate": "2025-12-17T05:20:14.678Z",
-      "status": "cancelled",
-      "notified": false,
-      "groupCode": "RES-1765344014678"
-    },
-    {
-      "id": "1765344014703-2-0",
-      "bookId": "2",
-      "memberId": "3",
-      "reservationDate": "2025-12-10T05:20:14.703Z",
-      "expirationDate": "2025-12-17T05:20:14.678Z",
-      "status": "cancelled",
-      "notified": false,
-      "groupCode": "RES-1765344014678"
     },
     {
       "id": "1765344256965-1765173460907-0",
@@ -737,6 +586,26 @@
       "status": "completed",
       "notified": true,
       "groupCode": "RES-1765347314788"
+    },
+    {
+      "id": "1765363736890-1765173460907-0",
+      "bookId": "1765173460907",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T10:48:56.890Z",
+      "expirationDate": "2025-12-17T10:48:56.890Z",
+      "status": "completed",
+      "notified": true,
+      "groupCode": "RES-1765363736890"
+    },
+    {
+      "id": "1765363785391-1-0",
+      "bookId": "1",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T10:49:45.391Z",
+      "expirationDate": "2025-12-17T10:49:45.391Z",
+      "status": "completed",
+      "notified": true,
+      "groupCode": "RES-1765363785391"
     }
   ],
   "fines": [

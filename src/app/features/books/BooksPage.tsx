@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Card, Table, Button, Badge, ButtonGroup, Alert } from 'react-bootstrap';
+import { Card, Table, Button, Badge, ButtonGroup, Alert, Form, InputGroup } from 'react-bootstrap';
 import { useData } from '../../shared/context/DataContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -20,6 +20,7 @@ const BooksPage = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const searchParams = new URLSearchParams(location.search);
   const stateReserve = (location.state as { reserveMode?: boolean } | null)?.reserveMode;
@@ -28,14 +29,28 @@ const BooksPage = () => {
 
   const [selectedMemberId, setSelectedMemberId] = useState<string>('');
 
+  // Filtrado de libros
+  const filteredBooks = books.filter((book: Book) => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    const authorName = getAuthorName(book.authorId).toLowerCase();
+    const publisherName = getPublisherName(book.publisherId).toLowerCase();
+    const categoryName = getCategoryName(book.categoryId).toLowerCase();
+    return book.title.toLowerCase().includes(search) ||
+           book.isbn.toLowerCase().includes(search) ||
+           authorName.includes(search) ||
+           publisherName.includes(search) ||
+           categoryName.includes(search);
+  });
+
   const totalSelected = useMemo(
     () => Object.values(selection).reduce((sum, count) => sum + count, 0),
     [selection]
   );
 
   const selectedBooks = useMemo(
-    () => books.filter((b: Book) => selection[b.id] > 0),
-    [books, selection]
+    () => filteredBooks.filter((b: Book) => selection[b.id] > 0),
+    [filteredBooks, selection]
   );
 
   const getAuthorName = (authorId: string) => {
@@ -187,6 +202,31 @@ const BooksPage = () => {
           )}
           {error && <Alert variant="danger" className="mb-3" onClose={() => setError('')} dismissible>{error}</Alert>}
           {info && <Alert variant="success" className="mb-3" onClose={() => setInfo('')} dismissible>{info}</Alert>}
+
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              <i className="bi bi-search"></i>
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar por título, ISBN, autor, editorial o categoría..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                <i className="bi bi-x-circle"></i>
+              </Button>
+            )}
+          </InputGroup>
+
+          {filteredBooks.length === 0 && searchTerm && (
+            <div className="text-center text-muted my-4">
+              <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
+              <p className="mt-2">No se encontraron libros que coincidan con "{searchTerm}"</p>
+            </div>
+          )}
+
           <Table responsive hover>
             <thead className="table-light">
               <tr>
@@ -203,7 +243,7 @@ const BooksPage = () => {
               </tr>
             </thead>
             <tbody>
-              {books.map((book: Book) => (
+              {filteredBooks.map((book: Book) => (
                 <tr key={book.id}>
                   <td><strong>{book.title}</strong></td>
                   <td><code>{book.isbn}</code></td>
@@ -275,7 +315,7 @@ const BooksPage = () => {
               ))}
             </tbody>
           </Table>
-          {books.length === 0 && (
+          {books.length === 0 && !searchTerm && (
             <div className="text-center py-5 text-muted">
               <i className="bi bi-inbox" style={{ fontSize: '3rem' }}></i>
               <p className="mt-3">No hay libros registrados</p>
