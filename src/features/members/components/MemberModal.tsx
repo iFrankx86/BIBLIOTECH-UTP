@@ -1,7 +1,8 @@
-import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
+import { Modal, Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useData } from '../../../shared/context/DataContext';
-import { Member } from '../../../shared/types';
+import { Member, User } from '../../../shared/types';
+import { usersAPI } from '../../../shared/services/api';
 
 interface MemberModalProps {
   show: boolean;
@@ -12,6 +13,8 @@ interface MemberModalProps {
 
 const MemberModal = ({ show, onHide, member, readOnly = false }: MemberModalProps) => {
   const { addMember, updateMember } = useData();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     firstName: member?.firstName || '',
@@ -22,6 +25,9 @@ const MemberModal = ({ show, onHide, member, readOnly = false }: MemberModalProp
     membershipType: (member?.membershipType || 'basic') as 'basic' | 'premium' | 'vip',
     idNumber: member?.idNumber || '',
     active: member?.active ?? true,
+    username: '',
+    password: '',
+    confirmPassword: '',
   });
 
   useEffect(() => {
@@ -34,58 +40,105 @@ const MemberModal = ({ show, onHide, member, readOnly = false }: MemberModalProp
       membershipType: (member?.membershipType || 'basic') as 'basic' | 'premium' | 'vip',
       idNumber: member?.idNumber || '',
       active: member?.active ?? true,
+      username: '',
+      password: '',
+      confirmPassword: '',
     });
+    setError('');
   }, [member, show]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    
     if (readOnly) {
       onHide();
       return;
     }
-    
-    if (member) {
-      // Update existing member
-      const updatedMember = new Member(
-        member.id,
-        formData.firstName,
-        formData.lastName,
-        formData.email,
-        formData.phone,
-        formData.address,
-        formData.membershipType,
-        formData.idNumber,
-        formData.active
-      );
-      updatedMember.membershipDate = member.membershipDate;
-      updateMember(updatedMember);
-    } else {
-      // Create new member
-      const newMember = new Member(
-        Date.now().toString(),
-        formData.firstName,
-        formData.lastName,
-        formData.email,
-        formData.phone,
-        formData.address,
-        formData.membershipType,
-        formData.idNumber,
-        formData.active
-      );
-      addMember(newMember);
+
+    // Validar credenciales solo al crear nuevo miembro
+    if (!member) {
+      if (!formData.username || !formData.password) {
+        setError('Usuario y contraseña son requeridos para nuevos miembros');
+        return;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        setError('Las contraseñas no coinciden');
+        return;
+      }
+      if (formData.password.length < 6) {
+        setError('La contraseña debe tener al menos 6 caracteres');
+        return;
+      }
     }
+
+    setLoading(true);
     
-    onHide();
-    setFormData({
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      address: '',
-      membershipType: 'basic',
-      idNumber: '',
-      active: true,
-    });
+    try {
+      if (member) {
+        // Update existing member
+        const updatedMember = new Member(
+          member.id,
+          formData.firstName,
+          formData.lastName,
+          formData.email,
+          formData.phone,
+          formData.address,
+          formData.membershipType,
+          formData.idNumber,
+          formData.active
+        );
+        updatedMember.membershipDate = member.membershipDate;
+        await updateMember(updatedMember);
+      } else {
+        // Create new member
+        const newMember = new Member(
+          Date.now().toString(),
+          formData.firstName,
+          formData.lastName,
+          formData.email,
+          formData.phone,
+          formData.address,
+          formData.membershipType,
+          formData.idNumber,
+          formData.active
+        );
+        await addMember(newMember);
+        
+        // Crear usuario asociado para login
+        const newUser = new User(
+          Date.now().toString(),
+          formData.username,
+          formData.password,
+          formData.email,
+          'member',
+          `${formData.firstName} ${formData.lastName}`,
+          true
+        );
+        
+        await usersAPI.create(newUser);
+      }
+      
+      onHide();
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        address: '',
+        membershipType: 'basic',
+        idNumber: '',
+        active: true,
+        username: '',
+        password: '',
+        confirmPassword: '',
+      });
+    } catch (err) {
+      setError('Error al guardar el miembro. Por favor intente nuevamente.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const modalTitle = member ? (readOnly ? 'Detalle de Miembro' : 'Editar Miembro') : 'Agregar Nuevo Miembro';
@@ -100,6 +153,8 @@ const MemberModal = ({ show, onHide, member, readOnly = false }: MemberModalProp
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
+          {error && <Alert variant="danger">{error}</Alert>}
+          
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
@@ -206,13 +261,75 @@ const MemberModal = ({ show, onHide, member, readOnly = false }: MemberModalProp
             />
           </Form.Group>
 
-          <div className="d-flex justify-content-end gap-2">
-            <Button variant="secondary" onClick={onHide}>
+          {!member && !readOnly && (
+            <>
+              <hr />
+              <h6 className="mb-3">
+                <i className="bi bi-key me-2"></i>
+                Credenciales de Acceso al Sistema
+              </h6>
+              <Row>
+                <Col md={12}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Nombre de Usuario *</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={formData.username}
+                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                      required={!member}
+                      placeholder="Ej: juanperez"
+                    />
+                    <Form.Text className="text-muted">
+                      Este usuario se utilizará para iniciar sesión en el sistema
+                    </Form.Text>
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Contraseña *</Form.Label>
+                    <Form.Control
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      required={!member}
+                      minLength={6}
+                      placeholder="Mínimo 6 caracteres"
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Confirmar Contraseña *</Form.Label>
+                    <Form.Control
+                      type="password"
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      required={!member}
+                      minLength={6}
+                      placeholder="Repita la contraseña"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+            </>
+          )}
+
+          <div className="d-flex justify-content-end gap-2 mt-3">
+            <Button variant="secondary" onClick={onHide} disabled={loading}>
               {readOnly ? 'Cerrar' : 'Cancelar'}
             </Button>
             {!readOnly && (
-              <Button variant="primary" type="submit">
-                {member ? 'Actualizar' : 'Guardar'} Miembro
+              <Button variant="primary" type="submit" disabled={loading}>
+                {loading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Guardando...
+                  </>
+                ) : (
+                  <>{member ? 'Actualizar' : 'Guardar'} Miembro</>
+                )}
               </Button>
             )}
           </div>

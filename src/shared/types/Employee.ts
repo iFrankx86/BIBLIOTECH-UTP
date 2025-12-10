@@ -11,6 +11,7 @@ export class Employee {
   salary: number;
   active: boolean;
   userId?: string;
+  idNumber?: string;
 
   constructor(
     id: string,
@@ -22,7 +23,8 @@ export class Employee {
     department: 'administration' | 'circulation' | 'cataloging' | 'reference' | 'maintenance',
     hireDate: Date,
     salary: number,
-    active: boolean = true
+    active: boolean = true,
+    idNumber?: string
   ) {
     this.id = id;
     this.firstName = firstName;
@@ -34,6 +36,7 @@ export class Employee {
     this.hireDate = hireDate;
     this.salary = salary;
     this.active = active;
+    this.idNumber = idNumber;
   }
 
   get fullName(): string {

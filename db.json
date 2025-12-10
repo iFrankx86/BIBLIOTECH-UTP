@@ -283,6 +283,20 @@
       "description": "",
       "language": "Español",
       "pages": 67
+    },
+    {
+      "id": "1765353364919",
+      "title": "AbejaWar",
+      "isbn": "12312344",
+      "authorId": "1",
+      "publisherId": "1",
+      "categoryId": "3",
+      "publicationYear": 2020,
+      "totalCopies": 9,
+      "availableCopies": 9,
+      "description": "Abeja Guerrera",
+      "language": "Español",
+      "pages": 302
     }
   ],
   "members": [

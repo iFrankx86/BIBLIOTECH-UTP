@@ -8,6 +8,8 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [idNumber, setIdNumber] = useState('');
+  const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,7 +63,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const result = await register({ fullName, username, email, password });
+      const result = await register({ fullName, username, email, password, idNumber, phone });
       if (result.ok) {
         setInfo('Registro exitoso. Redirigiendo...');
         navigate('/dashboard');
@@ -92,16 +94,47 @@ const Login = () => {
 
               {isRegisterMode ? (
                 <Form onSubmit={handleRegister}>
-                  <Form.Group className="mb-3" controlId="fullName">
-                    <Form.Label>Nombre completo</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Ej. Ana Pérez"
-                      value={fullName}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
-                      required
-                    />
-                  </Form.Group>
+                  <Row>
+                    <Col md={12}>
+                      <Form.Group className="mb-3" controlId="fullName">
+                        <Form.Label>Nombre completo</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Ej. Ana Pérez"
+                          value={fullName}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
+                          required
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col md={6}>
+                      <Form.Group className="mb-3" controlId="idNumber">
+                        <Form.Label>N° Identificación</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Ej. 12345678-9"
+                          value={idNumber}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdNumber(e.target.value)}
+                          required
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                      <Form.Group className="mb-3" controlId="phone">
+                        <Form.Label>Teléfono</Form.Label>
+                        <Form.Control
+                          type="tel"
+                          placeholder="Ej. +56912345678"
+                          value={phone}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhone(e.target.value)}
+                          required
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
 
                   <Form.Group className="mb-3" controlId="email">
                     <Form.Label>Email</Form.Label>
@@ -136,7 +169,11 @@ const Login = () => {
                       value={password}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                       required
+                      minLength={6}
                     />
+                    <Form.Text className="text-muted">
+                      Mínimo 6 caracteres
+                    </Form.Text>
                   </Form.Group>
 
                   <Button variant="success" type="submit" className="w-100 mb-3" disabled={loading}>

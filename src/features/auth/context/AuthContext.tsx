@@ -6,7 +6,7 @@ import { usersAPI, employeesAPI } from '../../../shared/services/api';
 interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => Promise<boolean>;
-  register: (payload: { fullName: string; username: string; email: string; password: string }) => Promise<{ ok: boolean; message?: string }>;
+  register: (payload: { fullName: string; username: string; email: string; password: string; idNumber?: string; phone?: string }) => Promise<{ ok: boolean; message?: string }>;
   logout: () => void;
   isAuthenticated: boolean;
   loading: boolean;
@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
     await employeesAPI.create(employee);
   };
 
-  const register = async (payload: { fullName: string; username: string; email: string; password: string }): Promise<{ ok: boolean; message?: string }> => {
+  const register = async (payload: { fullName: string; username: string; email: string; password: string; idNumber?: string; phone?: string }): Promise<{ ok: boolean; message?: string }> => {
     setLoading(true);
     try {
       const existing = await usersAPI.getAll();
@@ -104,12 +104,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
           firstName,
           lastName,
           payload.email,
-          '',
+          payload.phone || '',
           'Bibliotecario',
           'circulation',
           new Date(),
           0,
-          true
+          true,
+          payload.idNumber || ''
         );
         employee.userId = response.data.id;
         await employeesAPI.create(employee);
