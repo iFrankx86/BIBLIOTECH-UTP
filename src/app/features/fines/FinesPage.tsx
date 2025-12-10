@@ -5,6 +5,7 @@ import { useAuth } from '../../shared/context/AuthContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 import { Fine, Member } from '../../shared/types';
 import FineModal from './FineModal';
+import { formatCurrency, formatShortDate } from '../../shared/utils';
 
 const FinesPage = () => {
   const { fines, members } = useData();
@@ -118,12 +119,12 @@ const FinesPage = () => {
                   {role !== 'member' && <td>{getMemberName(fine.memberId)}</td>}
                   <td>{fine.reason}</td>
                   <td>
-                    <strong className="text-danger">${fine.amount?.toFixed(2) || '0.00'}</strong>
+                    <strong className="text-danger">{formatCurrency(fine.amount || 0)}</strong>
                   </td>
-                  <td>{new Date(fine.issueDate).toLocaleDateString()}</td>
+                  <td>{formatShortDate(fine.issueDate)}</td>
                   <td>
                     {fine.paymentDate 
-                      ? new Date(fine.paymentDate).toLocaleDateString()
+                      ? formatShortDate(fine.paymentDate)
                       : <span className="text-muted">-</span>
                     }
                   </td>

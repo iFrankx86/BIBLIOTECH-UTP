@@ -297,6 +297,20 @@
       "description": "Abeja Guerrera",
       "language": "Español",
       "pages": 302
+    },
+    {
+      "id": "1765365257292",
+      "title": "El Perro Wau",
+      "isbn": "2342424242",
+      "authorId": "1",
+      "publisherId": "3",
+      "categoryId": "1",
+      "publicationYear": 2024,
+      "totalCopies": 20,
+      "availableCopies": 20,
+      "description": "Asombroso perro wau",
+      "language": "Español",
+      "pages": 150
     }
   ],
   "members": [

@@ -4,6 +4,8 @@ import { useData } from '../../shared/context/DataContext';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 import { Member } from '../../shared/types';
 import MemberModal from './MemberModal';
+import { formatShortDate } from '../../shared/utils';
+
 
 const MembersPage = () => {
   const { members, deleteMember, updateMember } = useData();
@@ -23,11 +25,6 @@ const MembersPage = () => {
            member.idNumber.toLowerCase().includes(search) ||
            member.membershipType.toLowerCase().includes(search);
   });
-
-  const formatDate = (dateValue: Date | string) => {
-    const parsed = new Date(dateValue);
-    return Number.isNaN(parsed.getTime()) ? 'Sin fecha' : parsed.toLocaleDateString();
-  };
 
   const toggleActive = async (member: Member) => {
     const updated = new Member(
@@ -121,7 +118,7 @@ const MembersPage = () => {
                       {member.membershipType.toUpperCase()}
                     </Badge>
                   </td>
-                  <td>{formatDate(member.membershipDate)}</td>
+                  <td>{formatShortDate(member.membershipDate)}</td>
                   <td>
                     <div className="d-flex align-items-center gap-2">
                       <Badge bg={member.active ? 'success' : 'danger'}>

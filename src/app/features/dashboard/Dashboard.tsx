@@ -1,6 +1,6 @@
 import { Row, Col, Card } from 'react-bootstrap';
 import { useAuth } from '../../shared/context/AuthContext';
-
+import { getGreeting } from '../../shared/utils';
 import { useState } from 'react';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 import BookModal from '../books/BookModal';
@@ -30,10 +30,7 @@ const Dashboard = () => {
   const overdueLoans = loans.filter((loan: Loan) => loan.status === 'overdue' || (!loan.returnDate && new Date() > new Date(loan.dueDate))).length;
   const pendingFines = fines.filter((fine: Fine) => fine.status === 'pending').length;
 
-  const currentHour = new Date().getHours();
-  let greeting = 'Buenos días';
-  if (currentHour >= 12 && currentHour < 19) greeting = 'Buenas tardes';
-  if (currentHour >= 19) greeting = 'Buenas noches';
+  const greeting = getGreeting();
 
   return (
     <>
