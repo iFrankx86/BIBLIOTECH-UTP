@@ -293,9 +293,10 @@
       "email": "juan.perez@email.com",
       "phone": "555-0101",
       "address": "Calle Principal 123",
-      "membershipDate": null,
-      "membershipType": "premium",
-      "active": true
+      "membershipDate": "1970-01-01T00:00:00.000Z",
+      "membershipType": "basic",
+      "active": true,
+      "idNumber": "78451245"
     },
     {
       "id": "2",
@@ -304,10 +305,10 @@
       "email": "maria.gonzalez@email.com",
       "phone": "555-0102",
       "address": "Avenida Central 456",
+      "membershipDate": null,
       "membershipType": "basic",
-      "membershipNumber": "87654321",
       "active": true,
-      "joinDate": "2024-02-20T00:00:00.000Z"
+      "idNumber": "12323454"
     },
     {
       "id": "3",
@@ -316,10 +317,10 @@
       "email": "carlos.ramirez@email.com",
       "phone": "555-0103",
       "address": "Boulevard Norte 789",
-      "membershipType": "premium",
-      "membershipNumber": "11223344",
+      "membershipDate": null,
+      "membershipType": "basic",
       "active": true,
-      "joinDate": "2024-03-10T00:00:00.000Z"
+      "idNumber": "12234556"
     },
     {
       "id": "1765173398700",
