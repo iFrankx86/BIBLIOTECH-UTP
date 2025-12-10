@@ -6,9 +6,13 @@ import { useNavigate } from 'react-router-dom';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
+  const { login, register } = useAuth();
   const navigate = useNavigate();
 
   const quickLogin = async (user: string, pass: string) => {
@@ -50,6 +54,27 @@ const Login = () => {
     }
   };
 
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+    setInfo('');
+    setLoading(true);
+
+    try {
+      const result = await register({ fullName, username, email, password });
+      if (result.ok) {
+        setInfo('Registro exitoso. Redirigiendo...');
+        navigate('/dashboard');
+      } else {
+        setError(result.message || 'No se pudo registrar');
+      }
+    } catch (err) {
+      setError('Error al conectar con el servidor. Asegúrate de que json-server esté corriendo.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Container fluid className="vh-100 d-flex align-items-center justify-content-center bg-light">
       <Row className="w-100">
@@ -62,42 +87,117 @@ const Login = () => {
                 <p className="text-muted">Sistema de Gestión de Biblioteca</p>
               </div>
 
-              {error && <Alert variant="danger">{error}</Alert>}
+              {error && <Alert variant="danger" className="mb-3">{error}</Alert>}
+              {info && <Alert variant="success" className="mb-3">{info}</Alert>}
 
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="username">
-                  <Form.Label>Usuario</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Ingrese su usuario"
-                    value={username}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
-                    required
-                  />
-                </Form.Group>
+              {isRegisterMode ? (
+                <Form onSubmit={handleRegister}>
+                  <Form.Group className="mb-3" controlId="fullName">
+                    <Form.Label>Nombre completo</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Ej. Ana Pérez"
+                      value={fullName}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
 
-                <Form.Group className="mb-3" controlId="password">
-                  <Form.Label>Contraseña</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Ingrese su contraseña"
-                    value={password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                    required
-                  />
-                </Form.Group>
+                  <Form.Group className="mb-3" controlId="email">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control
+                      type="email"
+                      placeholder="correo@ejemplo.com"
+                      value={email}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                      required
+                    />
+                    <Form.Text className="text-muted">
+                      Correos @bibliotech.com se registran como Bibliotecario. Otros dominios serán rol Miembro.
+                    </Form.Text>
+                  </Form.Group>
 
-                <Button variant="primary" type="submit" className="w-100 mb-3" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      Iniciando sesión...
-                    </>
-                  ) : (
-                    'Iniciar Sesión'
-                  )}
-                </Button>
-              </Form>
+                  <Form.Group className="mb-3" controlId="username">
+                    <Form.Label>Usuario</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Elige un usuario"
+                      value={username}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="password">
+                    <Form.Label>Contraseña</Form.Label>
+                    <Form.Control
+                      type="password"
+                      placeholder="Crea una contraseña"
+                      value={password}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+
+                  <Button variant="success" type="submit" className="w-100 mb-3" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Registrando...
+                      </>
+                    ) : (
+                      'Crear cuenta'
+                    )}
+                  </Button>
+                </Form>
+              ) : (
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-3" controlId="username">
+                    <Form.Label>Usuario</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Ingrese su usuario"
+                      value={username}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="password">
+                    <Form.Label>Contraseña</Form.Label>
+                    <Form.Control
+                      type="password"
+                      placeholder="Ingrese su contraseña"
+                      value={password}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+
+                  <Button variant="primary" type="submit" className="w-100 mb-3" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Iniciando sesión...
+                      </>
+                    ) : (
+                      'Iniciar Sesión'
+                    )}
+                  </Button>
+                </Form>
+              )}
+
+              <Button
+                variant="link"
+                className="w-100 mb-3"
+                onClick={() => {
+                  setError('');
+                  setInfo('');
+                  setIsRegisterMode(!isRegisterMode);
+                }}
+              >
+                {isRegisterMode ? '¿Ya tienes cuenta? Inicia sesión' : '¿Nuevo aquí? Crear cuenta'}
+              </Button>
 
               <div className="mt-4">
                 <p className="text-muted mb-3 text-center"><strong>Inicio Rápido:</strong></p>

@@ -1,16 +1,14 @@
 import { Row, Col, Card, Button, Table } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
-import { useState } from 'react';
-import ReservationModal from '../components/modals/ReservationModal';
+import { useNavigate } from 'react-router-dom';
 import { Loan, Reservation, Fine, Book } from '../models';
 
 
 const MemberDashboard = () => {
   const { user } = useAuth();
   const { loans, reservations, fines, books } = useData();
-  
-  const [showReservationModal, setShowReservationModal] = useState(false);
+  const navigate = useNavigate();
 
   // Filtrar datos del miembro actual
   const myLoans = loans.filter((loan: Loan) => loan.memberId === user?.id);
@@ -108,7 +106,7 @@ const MemberDashboard = () => {
               <div className="d-grid gap-2">
                 <Button 
                   variant="outline-primary"
-                  onClick={() => setShowReservationModal(true)}
+                  onClick={() => navigate('/books?reserve=1', { state: { reserveMode: true } })}
                 >
                   <i className="bi bi-bookmark-plus me-2"></i>Hacer Reserva
                 </Button>
@@ -240,12 +238,6 @@ const MemberDashboard = () => {
           </Card>
         </Col>
       </Row>
-
-      {/* Modales */}
-      <ReservationModal
-        show={showReservationModal}
-        onHide={() => setShowReservationModal(false)}
-      />
     </>
   );
 };

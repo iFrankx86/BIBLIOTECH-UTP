@@ -33,6 +33,10 @@ const FineModal = ({ show, onHide, fine }: FineModalProps) => {
       formData.status
     );
 
+    if (formData.status === 'paid') {
+      newFine.paymentDate = new Date();
+    }
+
     if (fine) {
       await updateFine(newFine);
     } else {

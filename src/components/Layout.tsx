@@ -13,6 +13,12 @@ const Layout = () => {
     navigate('/login');
   };
 
+  const openWindow = (path: string) => {
+    const url = `${window.location.origin}${path}`;
+    // Abrir en nueva pestaña (sin especificar features para evitar popup window)
+    window.open(url, '_blank', 'noopener');
+  };
+
   return (
     <>
       <Navbar bg="dark" variant="dark" expand="lg" className="mb-4">
@@ -66,6 +72,14 @@ const Layout = () => {
                 <NavDropdown.Item as={Link} to="/fines">
                   {role === 'member' ? 'Mis Multas' : 'Gestionar Multas'}
                 </NavDropdown.Item>
+              </NavDropdown>
+
+              {/* Lanzador multiventana */}
+              <NavDropdown title={<><i className="bi bi-columns-gap me-1"></i>Ventanas</>} id="multiwindow-dropdown">
+                <NavDropdown.Item onClick={() => openWindow('/dashboard')}>Dashboard</NavDropdown.Item>
+                <NavDropdown.Item onClick={() => openWindow('/books')}>Libros</NavDropdown.Item>
+                <NavDropdown.Item onClick={() => openWindow('/loans')}>Préstamos</NavDropdown.Item>
+                <NavDropdown.Item onClick={() => openWindow('/reservations')}>Reservas</NavDropdown.Item>
               </NavDropdown>
 
               {/* Menú de Gestión - Solo Admin */}

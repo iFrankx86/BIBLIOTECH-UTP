@@ -1,17 +1,20 @@
 import { useState } from 'react';
-import { Card, Table, Button, Badge, Alert, ButtonGroup, Spinner } from 'react-bootstrap';
+import { Card, Table, Button, Badge, Alert, ButtonGroup, Spinner, Modal, ListGroup } from 'react-bootstrap';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
 import { Reservation, Book, Member } from '../models';
 import ReservationModal from '../components/modals/ReservationModal';
+import { useNavigate } from 'react-router-dom';
 
 const ReservationsPage = () => {
-  const { reservations, books, members, confirmReservation, cancelReservation, completeReservation, deleteReservation } = useData();
+  const { reservations, books, members, confirmReservation, cancelReservation, convertReservationToLoan, deleteReservation } = useData();
   const { user } = useAuth();
   const { hasPermission, role } = usePermissions();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [detailReservation, setDetailReservation] = useState<Reservation | null>(null);
   const [error, setError] = useState('');
   const [processingId, setProcessingId] = useState<string | null>(null);
 
@@ -36,8 +39,7 @@ const ReservationsPage = () => {
   };
 
   const handleAdd = () => {
-    setSelectedReservation(null);
-    setShowModal(true);
+    navigate('/books?reserve=1', { state: { reserveMode: true } });
   };
 
   const handleConfirm = async (id: string) => {
@@ -59,11 +61,16 @@ const ReservationsPage = () => {
     setProcessingId(null);
   };
 
-  const handleComplete = async (id: string) => {
-    setProcessingId(id);
+  const handleCreateLoan = async (reservation: Reservation) => {
+    setProcessingId(reservation.id);
     setError('');
-    await completeReservation(id);
-    setProcessingId(null);
+    try {
+      await convertReservationToLoan(reservation.id, user?.id || 'system');
+    } catch (err) {
+      setError('No se pudo crear el préstamo desde la reserva.');
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -96,10 +103,18 @@ const ReservationsPage = () => {
               : 'Administra las reservas de libros de la biblioteca'}
           </p>
         </div>
-        <Button variant="primary" onClick={handleAdd}>
-          <i className="bi bi-plus-circle me-2"></i>
-          Nueva Reserva
-        </Button>
+        <div className="d-flex gap-2">
+          {role !== 'member' && (
+            <Button variant="outline-secondary" onClick={() => navigate('/books')}>
+              <i className="bi bi-journal-text me-2"></i>
+              Gestión de Libros
+            </Button>
+          )}
+          <Button variant="primary" onClick={handleAdd}>
+            <i className="bi bi-plus-circle me-2"></i>
+            Nueva Reserva
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -118,85 +133,88 @@ const ReservationsPage = () => {
                 <th>Fecha de Reserva</th>
                 <th>Fecha de Expiración</th>
                 <th>Estado</th>
-                {hasPermission('canManageReservations') && <th>Acciones</th>}
-                {role === 'member' && <th>Acciones</th>}
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {displayReservations.map((reservation: Reservation) => (
                 <tr key={reservation.id}>
-                  <td><code>#{reservation.id}</code></td>
+                  <td><code>#{reservation.groupCode || reservation.id}</code></td>
                   <td>{getBookTitle(reservation.bookId)}</td>
                   {role !== 'member' && <td>{getMemberName(reservation.memberId)}</td>}
                   <td>{new Date(reservation.reservationDate).toLocaleDateString()}</td>
                   <td>{new Date(reservation.expirationDate).toLocaleDateString()}</td>
                   <td>{getStatusBadge(reservation.status)}</td>
-                  {hasPermission('canManageReservations') && (
-                    <td>
-                      <ButtonGroup size="sm">
-                        {reservation.status === 'pending' && (
+                  <td>
+                    <ButtonGroup size="sm">
+                      <Button
+                        variant="outline-info"
+                        onClick={() => setDetailReservation(reservation)}
+                      >
+                        Ver
+                      </Button>
+                      {hasPermission('canManageReservations') ? (
+                        <>
+                          {reservation.status === 'pending' && (
+                            <Button
+                              variant="outline-success"
+                              onClick={() => handleConfirm(reservation.id)}
+                              disabled={processingId === reservation.id}
+                            >
+                              {processingId === reservation.id ? <Spinner size="sm" animation="border" /> : 'Confirmar'}
+                            </Button>
+                          )}
+                          {reservation.status === 'confirmed' && (
+                            <Button
+                              variant="outline-primary"
+                              onClick={() => handleCreateLoan(reservation)}
+                              disabled={processingId === reservation.id}
+                            >
+                              {processingId === reservation.id ? <Spinner size="sm" animation="border" /> : 'Crear préstamo'}
+                            </Button>
+                          )}
+                          {reservation.status !== 'completed' && (
+                            <Button
+                              variant="outline-danger"
+                              onClick={() => handleCancel(reservation.id)}
+                              disabled={processingId === reservation.id}
+                            >
+                              Cancelar
+                            </Button>
+                          )}
+                          {reservation.status !== 'completed' && (
+                            <Button
+                              variant="outline-secondary"
+                              onClick={() => {
+                                if (window.confirm('¿Eliminar esta reserva?')) {
+                                  handleDelete(reservation.id);
+                                }
+                              }}
+                              disabled={processingId === reservation.id}
+                            >
+                              Eliminar
+                            </Button>
+                          )}
                           <Button
-                            variant="outline-success"
-                            onClick={() => handleConfirm(reservation.id)}
-                            disabled={processingId === reservation.id}
+                            variant="outline-secondary"
+                            onClick={() => handleEdit(reservation)}
                           >
-                            {processingId === reservation.id ? <Spinner size="sm" animation="border" /> : 'Confirmar'}
+                            <i className="bi bi-pencil"></i>
                           </Button>
-                        )}
-                        {reservation.status === 'confirmed' && (
-                          <Button
-                            variant="outline-primary"
-                            onClick={() => handleComplete(reservation.id)}
-                            disabled={processingId === reservation.id}
-                          >
-                            {processingId === reservation.id ? <Spinner size="sm" animation="border" /> : 'Completar'}
-                          </Button>
-                        )}
-                        {reservation.status !== 'completed' && (
+                        </>
+                      ) : (
+                        role === 'member' && reservation.status === 'pending' && (
                           <Button
                             variant="outline-danger"
                             onClick={() => handleCancel(reservation.id)}
                             disabled={processingId === reservation.id}
                           >
-                            Cancelar
+                            {processingId === reservation.id ? 'Cancelando...' : 'Cancelar'}
                           </Button>
-                        )}
-                        {reservation.status !== 'completed' && (
-                          <Button
-                            variant="outline-secondary"
-                            onClick={() => {
-                              if (window.confirm('¿Eliminar esta reserva?')) {
-                                handleDelete(reservation.id);
-                              }
-                            }}
-                            disabled={processingId === reservation.id}
-                          >
-                            Eliminar
-                          </Button>
-                        )}
-                        <Button
-                          variant="outline-secondary"
-                          onClick={() => handleEdit(reservation)}
-                        >
-                          <i className="bi bi-pencil"></i>
-                        </Button>
-                      </ButtonGroup>
-                    </td>
-                  )}
-                  {role === 'member' && (
-                    <td>
-                      {reservation.status === 'pending' && (
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          onClick={() => handleCancel(reservation.id)}
-                          disabled={processingId === reservation.id}
-                        >
-                          {processingId === reservation.id ? 'Cancelando...' : 'Cancelar'}
-                        </Button>
+                        )
                       )}
-                    </td>
-                  )}
+                    </ButtonGroup>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -216,6 +234,32 @@ const ReservationsPage = () => {
           onHide={() => setShowModal(false)}
           reservation={selectedReservation}
         />
+      )}
+
+      {detailReservation && (
+        <Modal show onHide={() => setDetailReservation(null)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Detalle de Reserva</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <ListGroup variant="flush">
+              <ListGroup.Item><strong>Código:</strong> {detailReservation.groupCode || detailReservation.id}</ListGroup.Item>
+              <ListGroup.Item><strong>Libro:</strong> {getBookTitle(detailReservation.bookId)}</ListGroup.Item>
+              {role !== 'member' && (
+                <ListGroup.Item><strong>Miembro:</strong> {getMemberName(detailReservation.memberId)}</ListGroup.Item>
+              )}
+              <ListGroup.Item><strong>Estado:</strong> {getStatusBadge(detailReservation.status)}</ListGroup.Item>
+              <ListGroup.Item><strong>Reserva:</strong> {new Date(detailReservation.reservationDate).toLocaleString()}</ListGroup.Item>
+              <ListGroup.Item><strong>Expira:</strong> {new Date(detailReservation.expirationDate).toLocaleString()}</ListGroup.Item>
+              {detailReservation.groupCode && (
+                <ListGroup.Item className="text-muted small">Lote de reserva: {detailReservation.groupCode}</ListGroup.Item>
+              )}
+            </ListGroup>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setDetailReservation(null)}>Cerrar</Button>
+          </Modal.Footer>
+        </Modal>
       )}
     </>
   );

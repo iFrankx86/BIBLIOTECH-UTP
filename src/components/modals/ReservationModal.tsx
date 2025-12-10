@@ -42,7 +42,8 @@ const ReservationModal = ({ show, onHide, reservation }: ReservationModalProps) 
       formData.memberId,
       reservation ? new Date(reservation.reservationDate) : new Date(),
       reservation ? new Date(reservation.expirationDate) : expirationDate,
-      reservation?.status || 'pending'
+      reservation?.status || 'pending',
+      reservation?.groupCode
     );
     newReservation.notified = reservation?.notified ?? false;
 

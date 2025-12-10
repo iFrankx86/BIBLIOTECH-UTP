@@ -26,9 +26,10 @@ interface DataContextType {
   addMember: (member: Member) => Promise<void>;
   updateMember: (member: Member) => Promise<void>;
   deleteMember: (id: string) => Promise<void>;
-  addLoan: (loan: Loan) => Promise<void>;
+  addLoan: (loan: Loan, adjustStock?: boolean) => Promise<void>;
   updateLoan: (loan: Loan) => Promise<void>;
   deleteLoan: (id: string) => Promise<void>;
+  convertReservationToLoan: (reservationId: string, employeeId: string, loanDays?: number) => Promise<Loan | null>;
   addCategory: (category: Category) => Promise<void>;
   updateCategory: (category: Category) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
@@ -258,12 +259,14 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
     setMembers(members.filter((member: Member) => member.id !== id));
   };
 
-  const addLoan = async (loan: Loan) => {
+  const addLoan = async (loan: Loan, adjustStock: boolean = true) => {
     const response = await loansAPI.create(loan);
     setLoans([...loans, response.data]);
-    const book = books.find((b: Book) => b.id === loan.bookId);
-    if (book && book.availableCopies > 0) {
-      await adjustAvailableCopies(book.id, -1);
+    if (adjustStock) {
+      const book = books.find((b: Book) => b.id === loan.bookId);
+      if (book && book.availableCopies > 0) {
+        await adjustAvailableCopies(book.id, -1);
+      }
     }
   };
 
@@ -337,7 +340,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
 
   const addReservation = async (reservation: Reservation) => {
     const response = await reservationsAPI.create(reservation);
-    setReservations([...reservations, response.data]);
+    setReservations((prev) => [...prev, response.data]);
   };
 
   const updateReservation = async (updatedReservation: Reservation) => {
@@ -379,7 +382,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
       reservation.memberId,
       new Date(reservation.reservationDate),
       new Date(reservation.expirationDate),
-      'confirmed'
+      'confirmed',
+      reservation.groupCode
     );
     updatedReservation.notified = true;
     await updateReservation(updatedReservation);
@@ -394,7 +398,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
       reservation.memberId,
       new Date(reservation.reservationDate),
       new Date(reservation.expirationDate),
-      'cancelled'
+      'cancelled',
+      reservation.groupCode
     );
     await updateReservation(updatedReservation);
   };
@@ -408,9 +413,49 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
       reservation.memberId,
       new Date(reservation.reservationDate),
       new Date(reservation.expirationDate),
-      'completed'
+      'completed',
+      reservation.groupCode
     );
     await updateReservation(updatedReservation);
+  };
+
+  const convertReservationToLoan = async (reservationId: string, employeeId: string, loanDays: number = 14) => {
+    const reservation = reservations.find((res: Reservation) => res.id === reservationId);
+    if (!reservation) return null;
+    if (reservation.status !== 'confirmed') {
+      throw new Error('Solo se pueden generar préstamos desde reservas confirmadas.');
+    }
+
+    const loanDate = new Date();
+    const dueDate = new Date(loanDate);
+    dueDate.setDate(dueDate.getDate() + loanDays);
+
+    const loan = new Loan(
+      `${Date.now()}-${reservation.bookId}`,
+      reservation.bookId,
+      reservation.memberId,
+      loanDate,
+      dueDate,
+      employeeId,
+      'active'
+    );
+    (loan as Loan & { reservationId?: string }).reservationId = reservation.id;
+
+    await addLoan(loan, false);
+
+    const completedReservation = new Reservation(
+      reservation.id,
+      reservation.bookId,
+      reservation.memberId,
+      new Date(reservation.reservationDate),
+      new Date(reservation.expirationDate),
+      'completed',
+      reservation.groupCode
+    );
+    completedReservation.notified = reservation.notified;
+    await updateReservation(completedReservation);
+
+    return loan;
   };
 
   const addFine = async (fine: Fine) => {
@@ -419,8 +464,17 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
   };
 
   const updateFine = async (updatedFine: Fine) => {
-    await finesAPI.update(updatedFine.id, updatedFine);
-    setFines(fines.map((fine: Fine) => fine.id === updatedFine.id ? updatedFine : fine));
+    const prev = fines.find((f: Fine) => f.id === updatedFine.id);
+    const wasPaid = prev?.status === 'paid';
+    const nowPaid = updatedFine.status === 'paid';
+
+    const fineToSave = { ...updatedFine } as Fine;
+    if (!wasPaid && nowPaid) {
+      fineToSave.paymentDate = new Date();
+    }
+
+    await finesAPI.update(fineToSave.id, fineToSave);
+    setFines(fines.map((fine: Fine) => fine.id === fineToSave.id ? fineToSave : fine));
   };
 
   const deleteFine = async (id: string) => {
@@ -522,6 +576,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
         addLoan,
         updateLoan,
         deleteLoan,
+        convertReservationToLoan,
         addCategory,
         updateCategory,
         deleteCategory,

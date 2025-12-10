@@ -9,6 +9,7 @@ export class Loan {
   status: 'active' | 'returned' | 'overdue';
   employeeId: string;
   notes?: string;
+  reservationId?: string;
 
   constructor(
     id: string,

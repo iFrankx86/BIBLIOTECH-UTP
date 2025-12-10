@@ -29,6 +29,26 @@
       "fullName": "Usuario Miembro",
       "active": true,
       "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "1765340826655",
+      "username": "Chayta",
+      "password": "chayta123",
+      "email": "rivera@bibliotech.com",
+      "role": "librarian",
+      "fullName": "Eduardo Rivera",
+      "active": true,
+      "createdAt": "2025-12-10T04:27:06.655Z"
+    },
+    {
+      "id": "1765341312014",
+      "username": "Silva",
+      "password": "silva123",
+      "email": "silva@gmail.com",
+      "role": "member",
+      "fullName": "Jefer Silva",
+      "active": true,
+      "createdAt": "2025-12-10T04:35:12.014Z"
     }
   ],
   "categories": [
@@ -147,7 +167,7 @@
       "categoryId": "1",
       "publicationYear": 1967,
       "totalCopies": 10,
-      "availableCopies": 7,
+      "availableCopies": 6,
       "description": "Novela del escritor colombiano Gabriel García Márquez",
       "language": "Español",
       "pages": 432
@@ -203,7 +223,7 @@
       "categoryId": "2",
       "publicationYear": 2025,
       "totalCopies": 12,
-      "availableCopies": 12,
+      "availableCopies": 11,
       "description": "",
       "language": "Español",
       "pages": 121
@@ -217,7 +237,7 @@
       "categoryId": "4",
       "publicationYear": 1998,
       "totalCopies": 10,
-      "availableCopies": 10,
+      "availableCopies": 9,
       "description": "Novela Peruana con Said",
       "language": "Español",
       "pages": 502
@@ -235,6 +255,34 @@
       "description": "Enamoramiento Precoz",
       "language": "Aleman",
       "pages": 5
+    },
+    {
+      "id": "1765331913123",
+      "title": "Aventuras de Darryl",
+      "isbn": "1231313133",
+      "authorId": "2",
+      "publisherId": "2",
+      "categoryId": "1",
+      "publicationYear": 2000,
+      "totalCopies": 3,
+      "availableCopies": 2,
+      "description": "Aventuras",
+      "language": "Español",
+      "pages": 56
+    },
+    {
+      "id": "1765347228530",
+      "title": "Brownie",
+      "isbn": "11313131313",
+      "authorId": "1765329886331",
+      "publisherId": "2",
+      "categoryId": "1",
+      "publicationYear": 2015,
+      "totalCopies": 5,
+      "availableCopies": 5,
+      "description": "",
+      "language": "Español",
+      "pages": 67
     }
   ],
   "members": [
@@ -310,6 +358,43 @@
       "hireDate": "2021-06-01T00:00:00.000Z",
       "salary": 35000,
       "active": true
+    },
+    {
+      "id": "1765340069898",
+      "firstName": "Karencita",
+      "lastName": "Guzmán",
+      "email": "karen@bibliotech.com",
+      "phone": "936951978",
+      "position": "Bibliotecaria",
+      "department": "cataloging",
+      "hireDate": "2025-12-09T00:00:00.000Z",
+      "salary": 5000,
+      "active": true
+    },
+    {
+      "id": "1765341206794",
+      "firstName": "Eduardo",
+      "lastName": "Rivera",
+      "email": "rivera@bibliotech.com",
+      "phone": "987995456",
+      "position": "Bibliotecario",
+      "department": "circulation",
+      "hireDate": "2025-12-10T00:00:00.000Z",
+      "salary": 2000,
+      "active": true
+    },
+    {
+      "id": "1765344342440",
+      "firstName": "Bibliotecario",
+      "lastName": "Principal",
+      "email": "librarian@bibliotech.com",
+      "phone": "",
+      "position": "Bibliotecario",
+      "department": "circulation",
+      "hireDate": "2025-12-10T05:25:42.440Z",
+      "salary": 0,
+      "active": true,
+      "userId": "2"
     }
   ],
   "loans": [
@@ -349,6 +434,26 @@
       "returnDate": "2025-12-10T01:25:33.839Z",
       "status": "returned",
       "employeeId": "1"
+    },
+    {
+      "id": "1765347065305-1",
+      "bookId": "1",
+      "memberId": "1765173398700",
+      "loanDate": "2025-12-10T06:11:05.305Z",
+      "dueDate": "2025-12-24T06:11:05.305Z",
+      "returnDate": "2025-12-10T06:11:20.045Z",
+      "status": "returned",
+      "employeeId": "2"
+    },
+    {
+      "id": "1765347616440-1765347228530",
+      "bookId": "1765347228530",
+      "memberId": "2",
+      "loanDate": "2025-12-10T06:20:16.440Z",
+      "dueDate": "2025-12-24T06:20:16.440Z",
+      "returnDate": "2025-12-10T06:20:28.426Z",
+      "status": "returned",
+      "employeeId": "1"
     }
   ],
   "reservations": [
@@ -358,8 +463,8 @@
       "memberId": "2",
       "reservationDate": "2025-12-01T00:00:00.000Z",
       "expirationDate": "2025-12-08T00:00:00.000Z",
-      "status": "confirmed",
-      "notified": true
+      "status": "completed",
+      "notified": false
     },
     {
       "id": "2",
@@ -448,8 +553,8 @@
       "memberId": "3",
       "reservationDate": "2025-12-09T23:55:01.133Z",
       "expirationDate": "2025-12-16T23:55:01.133Z",
-      "status": "confirmed",
-      "notified": true
+      "status": "completed",
+      "notified": false
     },
     {
       "id": "1765329960410",
@@ -457,8 +562,8 @@
       "memberId": "3",
       "reservationDate": "2025-12-10T01:26:00.410Z",
       "expirationDate": "2025-12-17T01:26:00.410Z",
-      "status": "confirmed",
-      "notified": true
+      "status": "completed",
+      "notified": false
     },
     {
       "id": "1765330086304",
@@ -466,8 +571,157 @@
       "memberId": "3",
       "reservationDate": "2025-12-10T01:28:06.304Z",
       "expirationDate": "2025-12-17T01:28:06.304Z",
-      "status": "confirmed",
-      "notified": true
+      "status": "completed",
+      "notified": false
+    },
+    {
+      "id": "1765338554141",
+      "bookId": "1",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T03:49:14.141Z",
+      "expirationDate": "2025-12-17T03:49:14.141Z",
+      "status": "completed",
+      "notified": false
+    },
+    {
+      "id": "1765343620478-1765173460907-0",
+      "bookId": "1765173460907",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:13:40.478Z",
+      "expirationDate": "2025-12-17T05:13:40.448Z",
+      "status": "cancelled",
+      "notified": false,
+      "groupCode": "RES-1765343620448"
+    },
+    {
+      "id": "1765343620482-1765331913123-0",
+      "bookId": "1765331913123",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:13:40.482Z",
+      "expirationDate": "2025-12-17T05:13:40.448Z",
+      "status": "cancelled",
+      "notified": false,
+      "groupCode": "RES-1765343620448"
+    },
+    {
+      "id": "1765343807471-1765324200150-0",
+      "bookId": "1765324200150",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:16:47.471Z",
+      "expirationDate": "2025-12-17T05:16:47.471Z",
+      "status": "cancelled",
+      "notified": false,
+      "groupCode": "RES-1765343807471"
+    },
+    {
+      "id": "1765343807494-1765331913123-0",
+      "bookId": "1765331913123",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:16:47.494Z",
+      "expirationDate": "2025-12-17T05:16:47.471Z",
+      "status": "cancelled",
+      "notified": false,
+      "groupCode": "RES-1765343807471"
+    },
+    {
+      "id": "1765343984005-3-0",
+      "bookId": "3",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:19:44.005Z",
+      "expirationDate": "2025-12-17T05:19:44.005Z",
+      "status": "cancelled",
+      "notified": false,
+      "groupCode": "RES-1765343984005"
+    },
+    {
+      "id": "1765343984032-1765173460907-0",
+      "bookId": "1765173460907",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:19:44.032Z",
+      "expirationDate": "2025-12-17T05:19:44.005Z",
+      "status": "cancelled",
+      "notified": false,
+      "groupCode": "RES-1765343984005"
+    },
+    {
+      "id": "1765343984037-1765331913123-0",
+      "bookId": "1765331913123",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:19:44.037Z",
+      "expirationDate": "2025-12-17T05:19:44.005Z",
+      "status": "cancelled",
+      "notified": false,
+      "groupCode": "RES-1765343984005"
+    },
+    {
+      "id": "1765344014678-1-0",
+      "bookId": "1",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:20:14.678Z",
+      "expirationDate": "2025-12-17T05:20:14.678Z",
+      "status": "cancelled",
+      "notified": false,
+      "groupCode": "RES-1765344014678"
+    },
+    {
+      "id": "1765344014703-2-0",
+      "bookId": "2",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:20:14.703Z",
+      "expirationDate": "2025-12-17T05:20:14.678Z",
+      "status": "cancelled",
+      "notified": false,
+      "groupCode": "RES-1765344014678"
+    },
+    {
+      "id": "1765344256965-1765173460907-0",
+      "bookId": "1765173460907",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:24:16.965Z",
+      "expirationDate": "2025-12-17T05:24:16.965Z",
+      "status": "completed",
+      "notified": false,
+      "groupCode": "RES-1765344256965"
+    },
+    {
+      "id": "1765344256996-1765324200150-0",
+      "bookId": "1765324200150",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:24:16.996Z",
+      "expirationDate": "2025-12-17T05:24:16.965Z",
+      "status": "completed",
+      "notified": false,
+      "groupCode": "RES-1765344256965"
+    },
+    {
+      "id": "1765344257012-1765331913123-0",
+      "bookId": "1765331913123",
+      "memberId": "3",
+      "reservationDate": "2025-12-10T05:24:17.012Z",
+      "expirationDate": "2025-12-17T05:24:16.965Z",
+      "status": "completed",
+      "notified": false,
+      "groupCode": "RES-1765344256965"
+    },
+    {
+      "id": "1765347056635-1-0",
+      "bookId": "1",
+      "memberId": "1765173398700",
+      "reservationDate": "2025-12-10T06:10:56.635Z",
+      "expirationDate": "2025-12-17T06:10:56.635Z",
+      "status": "completed",
+      "notified": true,
+      "groupCode": "RES-1765347056635"
+    },
+    {
+      "id": "1765347314788-1765347228530-0",
+      "bookId": "1765347228530",
+      "memberId": "2",
+      "reservationDate": "2025-12-10T06:15:14.788Z",
+      "expirationDate": "2025-12-17T06:15:14.788Z",
+      "status": "completed",
+      "notified": true,
+      "groupCode": "RES-1765347314788"
     }
   ],
   "fines": [
@@ -477,8 +731,9 @@
       "memberId": "3",
       "amount": 15.5,
       "reason": "Devolución tardía",
-      "issueDate": "2025-12-10T01:48:51.211Z",
-      "status": "pending"
+      "issueDate": "2025-12-10T06:19:44.070Z",
+      "paymentDate": "2025-12-10T06:19:44.070Z",
+      "status": "paid"
     },
     {
       "id": "2",
@@ -498,6 +753,15 @@
       "amount": 2,
       "reason": "Devolución tardía (1 día)",
       "issueDate": "2025-12-10T01:25:33.839Z",
+      "status": "pending"
+    },
+    {
+      "id": "1765332536551",
+      "loanId": "1",
+      "memberId": "1",
+      "amount": 50,
+      "reason": "Doblado a la pasta",
+      "issueDate": "2025-12-10T02:09:21.909Z",
       "status": "pending"
     }
   ],

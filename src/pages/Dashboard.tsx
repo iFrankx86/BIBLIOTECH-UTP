@@ -4,20 +4,20 @@ import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 import { usePermissions } from '../hooks/usePermissions';
 import BookModal from '../components/modals/BookModal';
-import LoanModal from '../components/modals/LoanModal';
 import MemberModal from '../components/modals/MemberModal';
 import MemberDashboard from './MemberDashboard';
 import { Book, Loan, Fine, Reservation } from '../models';
 import { useData } from '../context/DataContext';
+import { useNavigate } from 'react-router-dom';
 
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { hasPermission, role } = usePermissions();
   const { books, members, loans, reservations, fines } = useData();
+  const navigate = useNavigate();
   
   const [showBookModal, setShowBookModal] = useState(false);
-  const [showLoanModal, setShowLoanModal] = useState(false);
   const [showMemberModal, setShowMemberModal] = useState(false);
 
   // Si es miembro, mostrar dashboard específico para miembros
@@ -26,8 +26,8 @@ const Dashboard = () => {
   }
 
   const availableBooks = books.reduce((sum: number, book: Book) => sum + book.availableCopies, 0);
-  const activeLoans = loans.filter((loan: Loan) => loan.status === 'active').length;
-  const overdueLoans = loans.filter((loan: Loan) => loan.status === 'overdue').length;
+  const activeLoans = loans.filter((loan: Loan) => loan.status !== 'returned').length;
+  const overdueLoans = loans.filter((loan: Loan) => loan.status === 'overdue' || (!loan.returnDate && new Date() > new Date(loan.dueDate))).length;
   const pendingFines = fines.filter((fine: Fine) => fine.status === 'pending').length;
 
   const currentHour = new Date().getHours();
@@ -127,7 +127,7 @@ const Dashboard = () => {
                 {hasPermission('canManageLoans') && (
                   <button 
                     className="btn btn-outline-success text-start"
-                    onClick={() => setShowLoanModal(true)}
+                    onClick={() => navigate('/loans')}
                   >
                     <i className="bi bi-arrow-right-circle me-2"></i>Registrar Préstamo
                   </button>
@@ -138,6 +138,22 @@ const Dashboard = () => {
                     onClick={() => setShowMemberModal(true)}
                   >
                     <i className="bi bi-person-plus me-2"></i>Agregar Miembro
+                  </button>
+                )}
+                {hasPermission('canManageReservations') && (
+                  <button
+                    className="btn btn-outline-secondary text-start"
+                    onClick={() => navigate('/reservations')}
+                  >
+                    <i className="bi bi-bookmarks me-2"></i>Gestión de Reservas
+                  </button>
+                )}
+                {hasPermission('canManageBooks') && (
+                  <button
+                    className="btn btn-outline-dark text-start"
+                    onClick={() => navigate('/books')}
+                  >
+                    <i className="bi bi-journal-text me-2"></i>Gestión de Libros
                   </button>
                 )}
               </div>
@@ -190,7 +206,6 @@ const Dashboard = () => {
 
       {/* Modales multiventana */}
       <BookModal show={showBookModal} onHide={() => setShowBookModal(false)} />
-      <LoanModal show={showLoanModal} onHide={() => setShowLoanModal(false)} />
       <MemberModal show={showMemberModal} onHide={() => setShowMemberModal(false)} />
     </>
   );
