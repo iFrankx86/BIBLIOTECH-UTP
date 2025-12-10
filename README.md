@@ -25,20 +25,35 @@ El sistema está diseñado con arquitectura modular por features, siguiendo las 
 - Rutas protegidas con validación de acceso
 - Dashboards personalizados según rol
 - Creación automática de credenciales para empleados y miembros
+- **Registro de miembros**: Nuevos usuarios pueden auto-registrarse con validación de email, teléfono, DNI
 
 #### 📊 Módulos de Gestión Completos (CRUD)
-- **📚 Gestión de Libros**: Catálogo completo con información detallada (título, ISBN, autor, editorial, categoría, copias)
-- **✍️ Gestión de Autores**: Registro de autores con biografía y nacionalidad
-- **🏢 Gestión de Editoriales**: Control de casas editoriales con datos de contacto
-- **🏷️ Gestión de Categorías**: Organización del catálogo por categorías activas/inactivas
-- **👥 Gestión de Miembros**: Registro de usuarios con tipos de membresía (básica, premium, estudiante)
-- **👔 Gestión de Empleados**: Control de personal con departamentos, cargos y salarios
-- **📖 Gestión de Préstamos**: Sistema completo de préstamos con fechas, renovaciones y devoluciones
-- **📝 Gestión de Reservas**: Reservas con confirmación, cancelación y conversión a préstamo
-- **💰 Gestión de Multas**: Cálculo automático de multas por retraso con procesamiento de pagos
-- **📦 Gestión de Inventario**: Control físico de cada ejemplar (ubicación, condición, estado)
-- **🚚 Gestión de Proveedores**: Registro de proveedores con evaluación y contactos
-- **🔍 Operaciones Avanzadas**: Búsqueda, filtrado, cambio de estados, eliminación con confirmación
+- **📚 Gestión de Libros**: Catálogo completo con búsqueda (título, ISBN, autor, editorial, categoría) + validación de ISBN
+- **✍️ Gestión de Autores**: Registro de autores con búsqueda por nombre y nacionalidad
+- **🏢 Gestión de Editoriales**: Control de casas editoriales con búsqueda y datos de contacto
+- **🏷️ Gestión de Categorías**: Organización del catálogo con búsqueda por nombre
+- **👥 Gestión de Miembros**: Registro con validación de email, teléfono (9 dígitos), DNI (8 dígitos) + búsqueda
+- **👔 Gestión de Empleados**: Control de personal con búsqueda por nombre, cargo, departamento
+- **📖 Gestión de Préstamos**: Sistema completo con búsqueda por libro/miembro + devoluciones automáticas
+- **📝 Gestión de Reservas**: Reservas con búsqueda y cambio de estados
+- **💰 Gestión de Multas**: Cálculo automático con búsqueda por miembro y estado
+- **📦 Gestión de Inventario**: Control físico con búsqueda por código de barras
+- **🚚 Gestión de Proveedores**: Registro de proveedores con búsqueda
+- **🔍 Operaciones Avanzadas**: Búsqueda en tiempo real, filtrado, cambio de estados, eliminación con confirmación
+
+#### 🔍 Sistema de Búsqueda y Filtrado
+- **Búsqueda en tiempo real** en 11 módulos de gestión
+- Filtrado por múltiples criterios por cada entidad
+- Búsqueda full-text en campos relevantes
+- Resultados actualizados automáticamente
+- Soportado en: Libros, Autores, Editoriales, Categorías, Miembros, Empleados, Préstamos, Reservas, Multas, Inventario, Proveedores
+
+#### 📚 Librería de Utilidades (Utils)
+- **Formateadores**: `formatCurrency`, `formatDate`, `formatShortDate`, `formatFullName`, `formatPhone`, `formatISBN`, `truncateText`, `capitalizeWords`
+- **Validadores**: `isValidEmail`, `isValidISBN`, `isValidPhone`, `isValidDNI`, `isNotEmpty`, `isValidLength`, `isInRange`, `isValidURL`, `isValidYear`, `isNotFutureDate`, `isValidAmount`
+- **Helpers**: `getGreeting`, `calculateDaysOverdue`, `generateId`, `calculateFine`, `sortBy`, `groupBy`, `debounce` y más
+- **Integración automática** en formularios CRUD
+- Reutilizable en todo el proyecto
 
 #### 🎨 Interfaz de Usuario
 - Diseño responsive adaptado a móviles, tablets y desktop
@@ -46,8 +61,9 @@ El sistema está diseñado con arquitectura modular por features, siguiendo las 
 - Iconos de Bootstrap Icons 1.11.3
 - Modales interactivos para operaciones CRUD
 - Badges de estado con colores intuitivos
-- Tablas interactivas con acciones rápidas
+- Tablas interactivas con acciones rápidas y búsqueda
 - Notificaciones visuales de operaciones
+- Validación en tiempo real con mensajes descriptivos
 
 #### 🗄️ Persistencia y API
 - Backend simulado con **json-server** en puerto 3001
@@ -86,7 +102,8 @@ src/app/
     ├── context/      # Context API (AuthContext, DataContext)
     ├── hooks/        # Custom hooks (useAuth, useData, usePermissions)
     ├── services/     # Servicios API (api.ts con axios)
-    └── types/        # Modelos TypeScript (12 clases de dominio)
+    ├── types/        # Modelos TypeScript (12 clases de dominio)
+    └── utils/        # Librería de utilidades (formatters, validators, helpers)
 ```
 
 ### 📁 Estructura Completa del Proyecto
@@ -151,6 +168,11 @@ BIBLIOTECH-UTP/
 │   │       │   └── usePermissions.ts   # Hook de permisos por rol
 │   │       ├── services/
 │   │       │   └── api.ts              # Configuración de axios y endpoints
+│   │       ├── utils/                  # Librería de Utilidades
+│   │       │   ├── formatters.ts       # 8 funciones de formateo
+│   │       │   ├── validators.ts       # 11 validadores de datos
+│   │       │   ├── helpers.ts          # 21+ funciones auxiliares
+│   │       │   └── index.ts            # Exportación centralizada (barrel export)
 │   │       └── types/                  # 12 Clases de Dominio (TypeScript)
 │   │           ├── User.ts
 │   │           ├── Book.ts
@@ -191,6 +213,7 @@ BIBLIOTECH-UTP/
 | `shared/context/` | Estado global | AuthContext, DataContext |
 | `shared/hooks/` | Lógica reutilizable | useAuth, useData, usePermissions |
 | `shared/services/` | Comunicación API | Configuración axios, endpoints |
+| `shared/utils/` | Funciones auxiliares | Validadores, formateadores, helpers |
 | `shared/types/` | Modelos de datos | 12 clases de dominio TypeScript |
 
 ---
@@ -812,6 +835,11 @@ Este sistema utiliza `json-server` y **NO ES SEGURO PARA PRODUCCIÓN**:
 - ✅ Eliminación con confirmación
 - ✅ Dashboards diferenciados por rol
 - ✅ Arquitectura modular por features
+- ✅ **Búsqueda y filtrado en tiempo real** en 11 módulos (sin recargar página)
+- ✅ **Librería de Utilidades (Utils)**: Validadores, formateadores y helpers reutilizables
+- ✅ **Validadores integrados**: ISBN (10/13), email, teléfono (9 dígitos), DNI (8 dígitos), año
+- ✅ **Hidratación de datos**: Renderizado inmediato de registros nuevos sin recargar
+- ✅ **Registro automático de miembros**: Creación automática de record en tabla miembros al registrarse
 
 #### UI/UX
 - ✅ Diseño responsive (móvil, tablet, desktop)
@@ -821,6 +849,28 @@ Este sistema utiliza `json-server` y **NO ES SEGURO PARA PRODUCCIÓN**:
 - ✅ Estados de carga con spinners
 - ✅ Badges de estado con colores
 - ✅ Navegación con sidebar y navbar
+- ✅ **Validación en tiempo real** con mensajes de error descriptivos en modales
+
+#### Sistema de Búsqueda y Validación
+- ✅ **Búsqueda en tiempo real**: 11 módulos con filtrado por múltiples criterios
+  - Libros: título, ISBN, autor, editorial, categoría
+  - Miembros: nombre, email, teléfono, DNI, tipo membresía
+  - Empleados: nombre, email, teléfono, cargo, departamento
+  - Autores: nombre, nacionalidad
+  - Editoriales: nombre, país, email
+  - Categorías: nombre
+  - Préstamos: libro, miembro
+  - Reservas: libro, miembro
+  - Multas: miembro, estado
+  - Inventario: código de barras, libro
+  - Proveedores: nombre, contacto, email
+- ✅ **Validadores integrados en formularios**:
+  - **BookModal**: ISBN (10 o 13 dígitos), año válido (1900 a actual+1), campos obligatorios
+  - **MemberModal**: Email (formato válido), teléfono (9 dígitos o 51+9), DNI (8 dígitos), campos obligatorios
+- ✅ **Librería Utils** con funciones reutilizables:
+  - Validadores: `isValidEmail`, `isValidISBN`, `isValidPhone`, `isValidDNI`, `isNotEmpty`, etc.
+  - Formateadores: `formatCurrency`, `formatDate`, `formatPhone`, `formatISBN`, etc.
+  - Helpers: `getGreeting`, `calculateDaysOverdue`, `calculateFine`, `sortBy`, `groupBy`, etc.
 
 #### Infraestructura
 - ✅ TypeScript configurado con tipado estricto
