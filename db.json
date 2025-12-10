@@ -49,6 +49,86 @@
       "fullName": "Jefer Silva",
       "active": true,
       "createdAt": "2025-12-10T04:35:12.014Z"
+    },
+    {
+      "id": "1765365647464",
+      "username": "dsgdfgsdfgsd",
+      "password": "123123",
+      "email": "sd@gmail.com",
+      "role": "member",
+      "fullName": "sdgdsgdssdg dsdfsdgsdgds",
+      "active": true,
+      "createdAt": "2025-12-10T11:20:47.465Z"
+    },
+    {
+      "id": "1765365704651",
+      "username": "asdasd",
+      "password": "123123",
+      "email": "sda@gmail.com",
+      "role": "member",
+      "fullName": "asdfsadasasdasda asdasd",
+      "active": true,
+      "createdAt": "2025-12-10T11:21:44.651Z"
+    },
+    {
+      "id": "1765366221062",
+      "username": "franco",
+      "password": "fr12345",
+      "email": "Franco@gmail.com",
+      "role": "member",
+      "fullName": "Franco",
+      "active": true,
+      "createdAt": "2025-12-10T11:30:21.062Z"
+    },
+    {
+      "id": "1765366792900",
+      "username": "franco1",
+      "password": "franco123",
+      "email": "fra@gmail.com",
+      "role": "member",
+      "fullName": "Franco",
+      "active": true,
+      "createdAt": "2025-12-10T11:39:52.900Z"
+    },
+    {
+      "id": "1765367220815",
+      "username": "asdasd",
+      "password": "asd123",
+      "email": "asdasd@gmail.com",
+      "role": "member",
+      "fullName": "qwasdada asdadadada",
+      "active": true,
+      "createdAt": "2025-12-10T11:47:00.815Z"
+    },
+    {
+      "id": "1765367295279",
+      "username": "qwe",
+      "password": "qwe123",
+      "email": "qwe@gmail.com",
+      "role": "member",
+      "fullName": "asdasda dasdadasdadad",
+      "active": true,
+      "createdAt": "2025-12-10T11:48:15.279Z"
+    },
+    {
+      "id": "1765367445406",
+      "username": "wer",
+      "password": "wer123",
+      "email": "wer@gmail.com",
+      "role": "member",
+      "fullName": "khjkhkhkhh hjkhjkkk",
+      "active": true,
+      "createdAt": "2025-12-10T11:50:45.406Z"
+    },
+    {
+      "id": "1765367545742",
+      "username": "Franco Paolo",
+      "password": "franco666",
+      "email": "FrancoGarcia@bibliotech.com",
+      "role": "librarian",
+      "fullName": "Franco Garcia",
+      "active": true,
+      "createdAt": "2025-12-10T11:52:25.742Z"
     }
   ],
   "categories": [
@@ -223,7 +303,7 @@
       "categoryId": "2",
       "publicationYear": 2025,
       "totalCopies": 12,
-      "availableCopies": 10,
+      "availableCopies": 11,
       "description": "",
       "language": "Español",
       "pages": 121
@@ -311,6 +391,20 @@
       "description": "Asombroso perro wau",
       "language": "Español",
       "pages": 150
+    },
+    {
+      "id": "1765367027874",
+      "title": "sdfgdsfgdgdsfgdsfsdfg",
+      "isbn": "1234567891",
+      "authorId": "1",
+      "publisherId": "1",
+      "categoryId": "1",
+      "publicationYear": 2025,
+      "totalCopies": 23,
+      "availableCopies": 23,
+      "description": "gdsgsdgf",
+      "language": "Español",
+      "pages": 32
     }
   ],
   "members": [
@@ -361,6 +455,54 @@
       "membershipType": "basic",
       "active": true,
       "idNumber": "12345677"
+    },
+    {
+      "id": "1765366793184",
+      "firstName": "Franco",
+      "lastName": "Franco",
+      "email": "fra@gmail.com",
+      "phone": "903375490213",
+      "address": "",
+      "membershipDate": "2025-12-10T11:39:53.184Z",
+      "membershipType": "basic",
+      "active": true,
+      "idNumber": "141234312412"
+    },
+    {
+      "id": "1765367220092",
+      "firstName": "qwasdada",
+      "lastName": "asdadadada",
+      "email": "asdasd@gmail.com",
+      "phone": "123456789",
+      "address": "casa",
+      "membershipDate": "2025-12-10T11:47:00.092Z",
+      "membershipType": "basic",
+      "active": true,
+      "idNumber": "12345678"
+    },
+    {
+      "id": "1765367294537",
+      "firstName": "asdasda",
+      "lastName": "dasdadasdadad",
+      "email": "qwe@gmail.com",
+      "phone": "123456788",
+      "address": "zsdfsdf",
+      "membershipDate": "2025-12-10T11:48:14.537Z",
+      "membershipType": "basic",
+      "active": true,
+      "idNumber": "12345677"
+    },
+    {
+      "id": "1765367444666",
+      "firstName": "khjkhkhkhh",
+      "lastName": "hjkhjkkk",
+      "email": "wer@gmail.com",
+      "phone": "123456666",
+      "address": "casita",
+      "membershipDate": "2025-12-10T11:50:44.666Z",
+      "membershipType": "basic",
+      "active": true,
+      "idNumber": "11223344"
     }
   ],
   "employees": [
@@ -424,6 +566,20 @@
       "salary": 0,
       "active": true,
       "idNumber": "43567898"
+    },
+    {
+      "id": "1765367545024",
+      "firstName": "Franco",
+      "lastName": "Garcia",
+      "email": "FrancoGarcia@bibliotech.com",
+      "phone": "9033754100",
+      "position": "Asistente Bibliotecario",
+      "department": "circulation",
+      "hireDate": "2025-12-10T00:00:00.000Z",
+      "salary": 1600,
+      "active": true,
+      "userId": "1765367545742",
+      "idNumber": "754262980"
     }
   ],
   "loans": [
@@ -490,9 +646,9 @@
       "memberId": "3",
       "loanDate": "2025-12-10T10:49:27.803Z",
       "dueDate": "2025-12-24T10:49:27.803Z",
-      "status": "active",
-      "employeeId": "2",
-      "reservationId": "1765363736890-1765173460907-0"
+      "returnDate": "2025-12-10T11:54:24.090Z",
+      "status": "returned",
+      "employeeId": "2"
     },
     {
       "id": "1765363830055-1",

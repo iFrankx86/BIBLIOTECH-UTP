@@ -21,12 +21,13 @@ export const isValidISBN = (isbn: string): boolean => {
 };
 
 /**
- * Valida formato de teléfono peruano (9 dígitos)
+ * Valida teléfono: acepta 9 dígitos (cualquier prefijo) o con código de país 51 + 9 dígitos
  */
 export const isValidPhone = (phone: string): boolean => {
-  const cleanPhone = phone.replace(/[\s\-\+]/g, '');
-  // Acepta: 987654321 o 51987654321
-  return /^(51)?9\d{8}$/.test(cleanPhone);
+  const cleanPhone = phone.replace(/[^\d]/g, '');
+  const isNineDigits = cleanPhone.length === 9;
+  const isWithCountryCode = cleanPhone.startsWith('51') && cleanPhone.length === 11;
+  return isNineDigits || isWithCountryCode;
 };
 
 /**

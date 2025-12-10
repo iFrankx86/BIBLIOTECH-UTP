@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useData } from '../../shared/context/DataContext';
 import { Member, User } from '../../shared/types';
 import { usersAPI } from '../../shared/services/api';
+import { isValidEmail, isValidPhone, isValidDNI, isNotEmpty } from '../../shared/utils';
 
 interface MemberModalProps {
   show: boolean;
@@ -56,6 +57,37 @@ const MemberModal = ({ show, onHide, member, readOnly = false }: MemberModalProp
       return;
     }
 
+    // Validaciones de campos
+    if (!isNotEmpty(formData.firstName)) {
+      setError('El nombre es requerido');
+      return;
+    }
+    
+    if (!isNotEmpty(formData.lastName)) {
+      setError('El apellido es requerido');
+      return;
+    }
+    
+    if (!isValidEmail(formData.email)) {
+      setError('El email no es válido (ej: usuario@ejemplo.com)');
+      return;
+    }
+    
+    if (!isValidPhone(formData.phone)) {
+      setError('El teléfono debe tener 9 dígitos (ej: 987654321) o con código 51');
+      return;
+    }
+    
+    if (!isValidDNI(formData.idNumber)) {
+      setError('El DNI debe tener exactamente 8 dígitos');
+      return;
+    }
+    
+    if (!isNotEmpty(formData.address)) {
+      setError('La dirección es requerida');
+      return;
+    }
+    
     // Validar credenciales solo al crear nuevo miembro
     if (!member) {
       if (!formData.username || !formData.password) {

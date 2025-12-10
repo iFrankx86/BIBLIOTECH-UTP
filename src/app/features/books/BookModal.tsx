@@ -1,7 +1,8 @@
-import { Modal, Form, Button, Row, Col, Badge } from 'react-bootstrap';
+import { Modal, Form, Button, Row, Col, Badge, Alert } from 'react-bootstrap';
 import { useEffect, useMemo, useState } from 'react';
 import { useData } from '../../shared/context/DataContext';
 import { Book, Author, Publisher, Category } from '../../shared/types';
+import { isValidISBN, isNotEmpty, isValidYear } from '../../shared/utils';
 
 interface BookModalProps {
   show: boolean;
@@ -13,6 +14,7 @@ interface BookModalProps {
 const BookModal = ({ show, onHide, book, readOnly = false }: BookModalProps) => {
   const { addBook, updateBook, authors, publishers, categories } = useData();
   const [loading, setLoading] = useState(false);
+  const [validationError, setValidationError] = useState('');
   
   const [formData, setFormData] = useState({
     title: book?.title || '',
@@ -71,6 +73,45 @@ const BookModal = ({ show, onHide, book, readOnly = false }: BookModalProps) => 
       onHide();
       return;
     }
+    
+    setValidationError('');
+    
+    // Validaciones
+    if (!isNotEmpty(formData.title)) {
+      setValidationError('El título es requerido');
+      return;
+    }
+    
+    if (!isValidISBN(formData.isbn)) {
+      setValidationError('El ISBN debe tener 10 o 13 dígitos (ej: 9780123456789)');
+      return;
+    }
+    
+    if (!formData.authorId) {
+      setValidationError('Debe seleccionar un autor');
+      return;
+    }
+    
+    if (!formData.publisherId) {
+      setValidationError('Debe seleccionar una editorial');
+      return;
+    }
+    
+    if (!formData.categoryId) {
+      setValidationError('Debe seleccionar una categoría');
+      return;
+    }
+    
+    if (!isValidYear(formData.publicationYear)) {
+      setValidationError('El año de publicación debe estar entre 1900 y ' + (new Date().getFullYear() + 1));
+      return;
+    }
+    
+    if (formData.totalCopies < 1) {
+      setValidationError('El número de copias debe ser al menos 1');
+      return;
+    }
+    
     setLoading(true);
     
     try {
@@ -165,7 +206,13 @@ const BookModal = ({ show, onHide, book, readOnly = false }: BookModalProps) => 
             </div>
           </div>
         ) : (
-        <Form onSubmit={handleSubmit}>
+        <>
+          {validationError && (
+            <Alert variant="danger" dismissible onClose={() => setValidationError('')}>
+              {validationError}
+            </Alert>
+          )}
+          <Form onSubmit={handleSubmit}>
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
@@ -334,6 +381,7 @@ const BookModal = ({ show, onHide, book, readOnly = false }: BookModalProps) => 
             )}
           </div>
         </Form>
+        </>
         )}
       </Modal.Body>
     </Modal>

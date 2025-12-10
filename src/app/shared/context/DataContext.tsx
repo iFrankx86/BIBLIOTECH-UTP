@@ -246,7 +246,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
 
   const addMember = async (member: Member) => {
     const response = await membersAPI.create(member);
-    setMembers([...members, response.data]);
+    const [hydrated] = hydrateMembers([response.data as unknown as Record<string, unknown>]);
+    setMembers([...members, hydrated]);
   };
 
   const updateMember = async (updatedMember: Member) => {
@@ -514,7 +515,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
 
   const addEmployee = async (employee: Employee) => {
     const response = await employeesAPI.create(employee);
-    setEmployees([...employees, response.data]);
+    const [hydrated] = hydrateEmployees([response.data as unknown as Record<string, unknown>]);
+    setEmployees([...employees, hydrated]);
   };
 
   const updateEmployee = async (updatedEmployee: Employee) => {

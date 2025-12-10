@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
-import { User, Employee } from '../types';
-import { usersAPI, employeesAPI } from '../services/api';
+import { User, Employee, Member } from '../types';
+import { usersAPI, employeesAPI, membersAPI } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
@@ -118,6 +118,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
         );
         employee.userId = response.data.id;
         await employeesAPI.create(employee);
+      } else if (role === 'member') {
+        // Crear registro en la tabla members para usuarios miembros
+        const member = new Member(
+          Date.now().toString(),
+          firstName,
+          lastName,
+          payload.email,
+          payload.phone || '',
+          '', // address - se puede actualizar después
+          'basic', // membershipType por defecto
+          payload.idNumber || '',
+          true
+        );
+        member.membershipDate = new Date();
+        await membersAPI.create(member);
       }
 
       setUser(response.data);
